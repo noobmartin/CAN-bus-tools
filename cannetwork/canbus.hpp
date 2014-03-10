@@ -28,7 +28,7 @@
 #include <linux/can/raw.h>
 #include <linux/can/bcm.h>
 
-namespace trionicnet{
+namespace cannet{
 
 #define MAX_BUSNAME_SIZE 256
 #define MAX_CYCLIC_TX_FRAMES 256

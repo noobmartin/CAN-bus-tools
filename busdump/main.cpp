@@ -5,7 +5,7 @@ int main(){
   canusb_devices::lawicel_canusb adapter;
   adapter.auto_setup();
 
-  trionicnet::canbus canbus;
+  cannet::canbus canbus;
   canbus.set_busname(sizeof(adapter.interface_name), adapter.interface_name);
 
   struct timeval pump_rate;
@@ -21,7 +21,7 @@ int main(){
   cyclic_frame.can_dlc = 8;
   memcpy(cyclic_frame.data, data, 8);
 
-  trionicnet::frame_list_node fnode;
+  cannet::frame_list_node fnode;
   fnode.this_frame = &cyclic_frame;
   fnode.next_frame_list_node = 0;
 

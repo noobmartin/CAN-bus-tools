@@ -7,7 +7,7 @@
 
 #include "canbus.hpp"
 
-namespace trionicnet{
+namespace cannet{
 
 canbus::canbus(){
   bus_socket = 0x0;
