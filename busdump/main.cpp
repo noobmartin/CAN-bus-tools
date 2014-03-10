@@ -1,4 +1,5 @@
 #include "../cannetwork/canbus.hpp"
+#include "../cannetwork/trionic5/messages.hpp"
 #include "../adaptercode/lawicel-canusb.hpp"
 
 int main(){

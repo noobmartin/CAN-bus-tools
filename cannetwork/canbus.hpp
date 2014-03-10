@@ -30,8 +30,8 @@
 
 namespace cannet{
 
-#define MAX_BUSNAME_SIZE 256
-#define MAX_CYCLIC_TX_FRAMES 256
+#define MAX_BUSNAME_SIZE 	256
+#define MAX_CYCLIC_TX_FRAMES	256
 
 struct frame_list_node{
   can_frame* this_frame;
