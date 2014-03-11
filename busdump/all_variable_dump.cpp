@@ -16,7 +16,11 @@ int main(){
   canbus.open_bus();
 
   do{
-		canbus.send(&trionic5net::VSS_status);
+		canbus.send(&trionic5net::AD_trot);
+  	canbus.receive(19, receive_data, &incoming_frame_id);
+  	printf("I read the following from Trionic: %s\n", receive_data);
+		
+		canbus.send(&trionic5net::Rpm);
   	canbus.receive(19, receive_data, &incoming_frame_id);
   	printf("I read the following from Trionic: %s\n", receive_data);
   }while(1);
