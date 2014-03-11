@@ -117,6 +117,12 @@ int canbus::send(const unsigned int can_id, const unsigned size, const char* buf
 
 }
 
+int canbus::send(const can_frame* frame){
+	int written_bytes = write(bus_socket, frame, sizeof(can_frame));
+
+	return written_bytes;
+}
+
 void canbus::configure_cyclic_deaf_datapump(struct timeval cyclic_rate){
   tx_buffer.cyclic_header.opcode = 0x0;
   tx_buffer.cyclic_header.opcode = TX_SETUP;

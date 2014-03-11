@@ -31,6 +31,7 @@ void print_usage(void);
 
 void write_code_header(FILE* fp);
 void write_code_footer(FILE* fp);
+void write_generic_sram_response(FILE* fp);
 
 int main(int argc, char** argv){
 	if(argc != 3){
@@ -70,10 +71,11 @@ int main(int argc, char** argv){
 		len_two = len[1] & 0x000000FF;
 		unsigned int len_t = len_two | (len_one << 8);
 
-		fprintf(code_file, "  struct can_frame %s = {0x000, 8, {0xC7, 0x00, 0x00, 0x%x, 0x%x, 0x00, 0x00, 0x00} };\n", name, start_addr, start_addr+len_t );
+		fprintf(code_file, "  struct can_frame %s = {0x005, 8, {0xC7, 0x00, 0x00, 0x%x, 0x%x, 0x00, 0x00, 0x00} };\n", name, start_addr, start_addr+len_t );
 
 	}
 
+	write_generic_sram_response(code_file);
 	write_code_footer(code_file);
 }
 
@@ -90,6 +92,10 @@ void write_code_footer(FILE* fp){
 	fprintf(fp, "}\n");
 	fprintf(fp, "\n");
 	fprintf(fp, "#endif\n");
+}
+
+void write_generic_sram_response(FILE* fp){
+	fprintf(fp, "  struct can_frame generic_sram_response = {0x000, 8, {0xC6, 0x0C, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00} };\n");
 }
 
 void print_usage(void){

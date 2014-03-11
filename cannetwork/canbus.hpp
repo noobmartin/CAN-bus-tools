@@ -104,7 +104,8 @@ class canbus{
      */
     int receive(const unsigned size, char* buf, unsigned int* can_id);
     int send(const unsigned int can_id, const unsigned size, const char* buf);
-    
+   	int send(const can_frame* frame);
+
     /*
      * When using the broadcast manager, and you simply want to configure a set of frames
      * being sent cyclically, without caring to listen for incoming frames, use this operation.
