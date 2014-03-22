@@ -58,20 +58,23 @@ int main(int argc, char** argv){
 		get_length(trionicbinary, len);
 		get_variable_name(trionicbinary, name);
 
-		unsigned int start_addr_one = 0x0;
-		unsigned int start_addr_two = 0x0;
-		start_addr_one = addr[0] & 0x000000FF;
-		start_addr_two = addr[1] & 0x000000FF;
+		unsigned int start_addr_high = 0x0;
+		unsigned int start_addr_low = 0x0;
+		start_addr_high = addr[0] & 0x000000FF;
+		start_addr_low = addr[1] & 0x000000FF;
+		unsigned int start_addr = start_addr_low | (start_addr_high << 8);
 
-		unsigned int start_addr = start_addr_two | (start_addr_one << 8);
-		
 		unsigned int len_one = 0x0;
 		unsigned int len_two = 0x0;
 		len_one = len[0] & 0x000000FF;
 		len_two = len[1] & 0x000000FF;
 		unsigned int len_t = len_two | (len_one << 8);
 
-		fprintf(code_file, "  struct can_frame %s = {0x005, 8, {0xC7, 0x00, 0x00, 0x%x, 0x%x, 0x00, 0x00, 0x00} };\n", name, start_addr, start_addr+len_t );
+		unsigned int end_addr = start_addr+len_t;
+		unsigned int end_addr_low = end_addr & 0x000000FF;
+		unsigned int end_addr_high = (end_addr >> 8) & 0x000000FF;
+
+		fprintf(code_file, "  struct can_frame %s = {0x005, 8, {0xC7, 0x%x, 0x%x, 0x%x, 0x%x, 0x00, 0x00, 0x00} };\n", name, end_addr_high, end_addr_low, start_addr_high, start_addr_low);
 
 	}
 
