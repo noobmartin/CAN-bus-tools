@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QtGui/QMainWindow>
+#include <QtGui/QGraphicsScene>
+#include <QtGui/QGraphicsView>
 
 class MainWindow : public QMainWindow
 {
@@ -13,10 +15,11 @@ public:
 
 private slots:
   void connectWithTrionic();
-  void disconnectFromTrionic();
 
 private:
-
+  QGraphicsScene  *m_pScene;
+  QGraphicsView   *m_pView;
+  bool             connected;
 };
 
 #endif // MAINWINDOW_H
