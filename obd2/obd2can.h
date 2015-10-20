@@ -1,0 +1,8 @@
+#ifndef OBD2_CAN_H
+#define	OBD2_CAN_H
+
+#define CAN_OBD2_QUERY_MESSAGE_ID					0x7df
+#define CAN_OBD2_RESPONSE_MESSAGE_ID_LOW	0x7e8
+#define CAN_OBD2_RESPONSE_MESSAGE_ID_HIGH	0x7ef
+
+#endif

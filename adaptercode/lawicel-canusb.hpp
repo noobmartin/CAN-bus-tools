@@ -29,6 +29,18 @@ namespace canusb_devices{
 #define MAX_TTY_TX_SIZE 256
 #define LDISC_N_SLCAN 17
 
+typedef enum can_speed{
+	Kbit_10,
+	Kbit_20,
+	Kbit_50,
+	Kbit_100,
+	Kbit_125,
+	Kbit_250,
+	Kbit_500,
+	Kbit_800,
+	Mbit_1
+} can_speed;
+
 class lawicel_canusb{
   private:
     int ttyfd;
@@ -58,7 +70,7 @@ class lawicel_canusb{
      * This function sets the correct speed and TTY options to facilitate Trionic communication.
      * Returns 0 on failure.
      */
-    int set_lawicel_canusb_speed();
+    int set_lawicel_canusb_speed(can_speed Speed);
 
     /* 
      * This function will transform the serial interface to an ethernet interface.
