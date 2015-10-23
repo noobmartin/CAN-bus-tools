@@ -4,7 +4,7 @@
 /* List of On-board diagnostics (OBD) Parameter IDs (PID) */
 
 /* PIDs for OBD-II Mode 0x01 */
-enum{
+typedef enum{
 	SUPPORTED_PIDS 										= 0x00, /* Bit encoded [A7..D0] == [PID $01.. PID $20] */
 	MONITOR_STATUS										= 0x01,	/* Bit encoded */
 	FREEZE_DTC												= 0x02,
@@ -103,26 +103,26 @@ enum{
 	TURBOCHARGER_TEMPERATURE_1							= 0x75,
 	TURBOCHARGER_TEMPERATURE_2							= 0x76,
 	CHARGE_AIR_COOLER_TEMPERATURE						= 0x77
-}
+}MODE_ONE_PIDS;
 
 /* PIDs for OBD-II Mode 0x02 */
 enum{
 	DTC_ORIGIN_FOR_FREEZE_FRAME = 0x02
-}
+};
 
 /* PIDs for OBD-II Mode 0x03 */
 enum{
 	REQUEST_TROUBLE_CODES = 0x00
-}
+};
 
 /* PIDs for OBD-II Mode 0x04 */
 enum{
 	CLEAR_TROUBLE_CODES	= 0x00
-}
+};
 
 /* PIDs for OBD-II Mode 0x09 */
 enum{
-	SUPPORTED_PIDS 																= 0x00, /* Bit encoded [A7..D0] == [PID $01.. PID $20] */
+	SUPPORTED_PIDS_3															= 0x00, /* Bit encoded [A7..D0] == [PID $01.. PID $20] */
 	VEHICLE_IDENTIFICATION_MESSAGE_COUNT					= 0x01,
 	VEHICLE_IDENTIFICATION_NUMBER									= 0x02, /* Note: Returns 17-20 bytes Formula: ASCII-encoded and left-padded with 0x00 if needed. */
 	CALIBRATION_ID_MESSAGE_COUNT									= 0x03,
@@ -134,7 +134,7 @@ enum{
 	ECU_NAME_MESSAGE_COUNT												= 0x09,
 	ECU_NAME																			= 0x0A, /* Note: ASCII-encoded. Right-padded with 0x00 */
 	INHOUSE_PERFORMANCE_TRACKING_DIESEL						= 0x0B
-}
+};
 /*
 typedef enum{
 	OBD_II_CARB = 1 as defined by the CARB
@@ -175,7 +175,7 @@ typedef enum{
 }CONFORMED_OBD_STANDARD;
 */
 
-typedef enum{
+enum{
 	NOT_AVAILABLE	= 0,
 	GASOLINE			= 1,
 	METHANOL			= 2,
@@ -200,6 +200,6 @@ typedef enum{
 	HYBRID_ON_ELECTRIC_AND_COMBUSTION	= 21,
 	HYBRID_REGENERATIVE	= 22,
 	BIFUEL_ON_DIESEL		= 23
-}FUEL_TYPE;
+};
 
 #endif

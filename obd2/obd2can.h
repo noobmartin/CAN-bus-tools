@@ -8,10 +8,11 @@
  * 				If a request is transmitted using unicast, the device responding uses its singlecast message id + 8.
  */
 
-#define CAN_OBD2_QUERY_MESSAGE_ID_BROADCAST	0x7df
-#define CAN_OBD2_QUERY_MESSAGE_ID_LOW				0x7e0
-#define CAN_OBD2_QUERY_MESSAGE_ID_HIGH			0x7e7
-#define CAN_OBD2_RESPONSE_MESSAGE_ID_LOW		0x7e8
-#define CAN_OBD2_RESPONSE_MESSAGE_ID_HIGH		0x7ef
+#define CAN_OBD2_QUERY_MESSAGE_ID_BROADCAST		0x7df
+#define CAN_OBD2_QUERY_MESSAGE_ID_LOW						0x7e0
+#define CAN_OBD2_QUERY_MESSAGE_ID_HIGH					0x7e7
+#define CAN_OBD2_RESPONSE_MESSAGE_ID_LOW				0x7e8
+#define CAN_OBD2_RESPONSE_MESSAGE_ID_HIGH				0x7ef
+#define CAN_OBD2_QUERY_SAE_STANDARD_DATA_LENGTH	0x2
 
 #endif
