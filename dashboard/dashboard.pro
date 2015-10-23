@@ -19,5 +19,4 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h \
     speedo.h
 
-RESOURCES += \
-    icons.qrc
+RESOURCES +=
