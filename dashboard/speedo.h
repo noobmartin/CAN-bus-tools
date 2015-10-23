@@ -1,19 +1,21 @@
 #ifndef SPEEDO_H
 #define SPEEDO_H
 
-#include <QWidget>
+#include <QtGui/QGraphicsRectItem>
+#include <QtGui/QGraphicsScene>
 
-class Speedo : public QWidget {
-  Q_OBJECT
+class Speedo : public QObject {
+
 public:
-  explicit Speedo(QWidget *parent = 0);
+  explicit Speedo(QGraphicsScene *pScene, QObject *parent = 0);
 
-signals:
+  QGraphicsItem *graphicsItem();
 
 public slots:
 
 private:
-
+  QGraphicsRectItem *m_pRect;
+  QGraphicsScene *m_pScene;
 };
 
 #endif // SPEEDO_H

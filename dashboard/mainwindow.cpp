@@ -8,17 +8,28 @@
 
 #include <QtCore/QDebug>
 
+#include "speedo.h"
+
 MainWindow::MainWindow(QWidget *parent)
   : QMainWindow(parent) {
+
+  // setup graphics scene
+  m_pScene = new QGraphicsScene(this);
+  m_pScene->setBackgroundBrush(QBrush(Qt::gray));
+  m_pView = new QGraphicsView(m_pScene, this);
+  this->setCentralWidget(m_pView);
+
+  Speedo speedo(m_pScene, this);
+
+  // setup default status bar message
   this->statusBar()->showMessage("Disconnected");
 
   // setup toolbar
   QToolBar *pConnectionToolbar = this->addToolBar("Connection");
-  QIcon icon(":/icons/connect-icon.png");
-  QAction *pConnectAction = pConnectionToolbar->addAction(icon, "Connect", this, SLOT(connectWithTrionic()));
-  pConnectAction->setIconVisibleInMenu(true);
-  pConnectionToolbar->addAction("Disconnect", this, SLOT(disconnectFromTrionic()));
+  pConnectionToolbar->addAction("Connect", this, SLOT(connectWithTrionic()));
 
+  connected = false;
+  this->statusBar()->showMessage("Welcome to Trionicnet Dashboard...");
 }
 
 MainWindow::~MainWindow() {
@@ -28,8 +39,4 @@ MainWindow::~MainWindow() {
 void MainWindow::connectWithTrionic() {
   qDebug("User wants to mate with trionic...");
   this->statusBar()->showMessage("Connecting...");
-}
-
-void MainWindow::disconnectFromTrionic() {
-  qDebug("User wants to stop mating with trionic...");
 }
