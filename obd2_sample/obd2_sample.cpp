@@ -7,7 +7,7 @@
 #include "../cannetwork/utils.h"
 
 void unpack_data(unsigned int message_id, char* data, unsigned int data_size);
-void unpack_obd2_response(obd2_response* response, unsigned int data_size);
+void unpack_obd2_response(obd2_response* response);
 void unpack_engine_coolant(char A);
 
 int main(){
@@ -62,11 +62,11 @@ void unpack_data(unsigned int message_id, char* data, unsigned int data_size){
 			(message_id >= CAN_OBD2_RESPONSE_MESSAGE_ID_LOW))
 	{
 		printf("Found OBD-II response!\n");
-		unpack_obd2_response( (obd2_response*) data, data_size);
+		unpack_obd2_response( (obd2_response*) data);
 	}/*if*/
-}
+}/*unpack_data*/
 
-void unpack_obd2_response(obd2_response* response, unsigned int data_size){
+void unpack_obd2_response(obd2_response* response){
 	switch(response->pid){
 		case ENGINE_COOLANT_TEMP:
 			unpack_engine_coolant(response->A);
@@ -74,8 +74,8 @@ void unpack_obd2_response(obd2_response* response, unsigned int data_size){
 		default:
 			break;
 	}
-}
+}/*unpack_obd2_response*/
 
 void unpack_engine_coolant(char A){
 	printf("Engine coolant: %i Celsius\n", A-40);
-}
+}/*unpack_engine_coolant*/
