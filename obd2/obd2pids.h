@@ -21,7 +21,7 @@ typedef enum{
 	VEHICLE_SPEED											= 0x0D,	/* Min: 0			Max: 255		Unit: km/h				Formula: A 							*/
 	TIMING_ADVANCE										= 0x0E, /* Min: -64		Max: 63.5		Unit: degrees			Formula:	(A-128)/2			Note: Relative to #1 cylinder. */
 	INTAKE_AIR_TEMPERATURE						= 0x0F, /* Min: -40		Max: 215		Unit: Centigrade	Formula:	A-40						*/
-	MAF_AIR_FLOW_RATE									= 0x10, /* Min: 0			Max: 655.35	Unit:	grams/s			Formula:	((A*256)+B/100	*/
+	MAF_AIR_FLOW_RATE									= 0x10, /* Min: 0			Max: 655.35	Unit:	grams/s			Formula:	((A*256)+B)/100	*/
 	THROTTLE_POSITION									= 0x11,	/* Min: 0			Max: 100		Unit: %						Formula:	A*100/255				*/
 	COMMANDED_SECONDARY_AIR_STATUS		= 0x12, /* Bit encoded */
 	OXYGEN_SENSORS_PRESENT						= 0x13, /* [A0..A3] == Bank 1, Sensors1-4. [A4..A7] == Bank2 .. */

@@ -53,9 +53,7 @@ int main(){
 }
 
 void unpack_data(unsigned int message_id, char* data, unsigned int data_size){
-	if( (message_id <= CAN_OBD2_RESPONSE_MESSAGE_ID_HIGH) &&
-			(message_id >= CAN_OBD2_RESPONSE_MESSAGE_ID_LOW))
-	{
+	if(is_obd2_response(message_id)){
 		printf("Found OBD-II response!\n");
 		unpack_obd2_response( (obd2_response*) data);
 	}/*if*/
