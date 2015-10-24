@@ -55,9 +55,11 @@ void lawicel_canusb::unset_lawicel_canusb_device(){
 int lawicel_canusb::set_lawicel_canusb_speed(can_speed Speed){
 	switch(Speed){
 		case Kbit_500:
-			sprintf(tty_tx_buf, "S6\r");
+		  sprintf(tty_tx_buf, "s4037\n");
+			sprintf(tty_tx_buf, "S6\n");
 		default:
 		  sprintf(tty_tx_buf, "s4037\r");
+			sprintf(tty_tx_buf, "S6\r");
 			break;
 	}/*switch*/
 
@@ -136,6 +138,7 @@ int lawicel_canusb::close_lawicel_canusb(){
 void lawicel_canusb::auto_setup(){
   find_lawicel_canusb_devices();
   set_lawicel_canusb_device(serial_device_path);
+	close_lawicel_canusb();
   set_lawicel_canusb_speed(Kbit_500);
   open_lawicel_canusb();
   create_lawicel_canusb_interface();

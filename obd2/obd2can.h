@@ -15,4 +15,15 @@
 #define CAN_OBD2_RESPONSE_MESSAGE_ID_HIGH				0x7ef
 #define CAN_OBD2_QUERY_SAE_STANDARD_DATA_LENGTH	0x2
 
+typedef struct{
+	char	num_extra_bytes;
+	char	mode;
+	char	pid;
+	char	A;
+	char	B;
+	char	C;
+	char	D;
+	char	Extra;
+}obd2_response;
+
 #endif

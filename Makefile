@@ -1,10 +1,10 @@
-CPP=g++
+CPP=g++ -g
 CC=gcc
 CFLAGS=-I
 BIN=built
 
 obd:
-	$(CPP) -o $(BIN)/obd2 obd2_sample/obd2_sample.cpp adaptercode/lawicel-canusb.cpp cannetwork/canbus.cpp
+	$(CPP) -o $(BIN)/obd2 obd2_sample/obd2_sample.cpp adaptercode/lawicel-canusb.cpp cannetwork/canbus.cpp cannetwork/utils.c
 
 sample:
 	$(CPP) -o $(BIN)/sample busdump/main.cpp adaptercode/lawicel-canusb.cpp cannetwork/canbus.cpp
