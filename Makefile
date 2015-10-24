@@ -4,7 +4,7 @@ CFLAGS=-I
 BIN=built
 
 obd:
-	$(CPP) -o $(BIN)/obd2 obd2_sample/obd2_sample.cpp adaptercode/lawicel-canusb.cpp cannetwork/canbus.cpp cannetwork/utils.c
+	$(CPP) -o $(BIN)/obd2 obd2_sample/obd2_sample.cpp adaptercode/lawicel-canusb.cpp cannetwork/canbus.cpp obd2/utils.c
 
 sample:
 	$(CPP) -o $(BIN)/sample busdump/main.cpp adaptercode/lawicel-canusb.cpp cannetwork/canbus.cpp

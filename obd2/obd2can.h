@@ -16,6 +16,17 @@
 #define CAN_OBD2_QUERY_SAE_STANDARD_DATA_LENGTH	0x2
 
 typedef struct{
+	char	num_extra_bytes = CAN_OBD2_QUERY_SAE_STANDARD_DATA_LENGTH;
+	char	mode						= SHOW_CURRENT_DATA;
+	char	pid;
+	char	A								= 0x55;
+	char	B								= 0x55;
+	char	C								= 0x55;
+	char	D								= 0x55;
+	char	E								= 0x55;
+}obd2_request_current_data;
+
+typedef struct{
 	char	num_extra_bytes;
 	char	mode;
 	char	pid;

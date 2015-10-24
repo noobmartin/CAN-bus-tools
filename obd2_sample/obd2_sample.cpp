@@ -4,53 +4,51 @@
 #include "../obd2/obd2pids.h"
 #include "../obd2/obd2modes.h"
 #include "../obd2/obd2can.h"
-#include "../cannetwork/utils.h"
+#include "../obd2/utils.h"
 
 void unpack_data(unsigned int message_id, char* data, unsigned int data_size);
 void unpack_obd2_response(obd2_response* response);
 void unpack_engine_coolant(char A);
+void unpack_engine_rpm(char A, char B);
 
 int main(){
   canusb_devices::lawicel_canusb adapter;
   adapter.auto_setup();
   cannet::canbus canbus;
   canbus.set_busname(sizeof(adapter.interface_name), adapter.interface_name);
+	canbus.open_bus();
 
-  struct timeval pump_rate;
-  pump_rate.tv_sec = 1;
-  pump_rate.tv_usec = 0;
+	obd2_request_current_data	engine_coolant_temp_request;
+	obd2_request_current_data	rpm_request;
 
-  char data[8] = {CAN_OBD2_QUERY_SAE_STANDARD_DATA_LENGTH,
-									SHOW_CURRENT_DATA,
-									ENGINE_COOLANT_TEMP,
-									0x55,0x55,0x55,0x55,0x55};
-  
+	engine_coolant_temp_request.pid	= ENGINE_COOLANT_TEMP;
+	rpm_request.pid = ENGINE_RPM;
+
   struct can_frame obd2_frame;
   obd2_frame.can_id = CAN_OBD2_QUERY_MESSAGE_ID_BROADCAST;
   obd2_frame.can_dlc = 8;
-  memcpy(obd2_frame.data, data, 8);
 
-  cannet::frame_list_node fnode;
-  fnode.this_frame = &obd2_frame;
-  fnode.next_frame_list_node = 0;
-
-	canbus.open_bus();
-
-	canbus.send(&obd2_frame);
 
   unsigned int incoming_frame_id;
   char receive_data[20];
   memset(receive_data, 0x0, 20);
 
   do{
+		/* The right way to do this is to set up the request messages to be pumped out cyclically. */
+		memcpy(obd2_frame.data, &rpm_request, 8);
 		canbus.send(&obd2_frame);
+
   	unsigned int data_size = canbus.receive(19, receive_data, &incoming_frame_id);
-
 		unpack_data(incoming_frame_id, receive_data, data_size);
-		
 
-		incoming_frame_id = extract_message_id(incoming_frame_id);
-		printf("Rx - ID: %u (0x%x) Size: %u	Msg: %s\n", incoming_frame_id&CAN_ERR_MASK, incoming_frame_id, data_size, receive_data);
+		memcpy(obd2_frame.data, &engine_coolant_temp_request, 8);
+		canbus.send(&obd2_frame);
+
+  	data_size = canbus.receive(19, receive_data, &incoming_frame_id);
+		unpack_data(incoming_frame_id, receive_data, data_size);
+
+		//incoming_frame_id = extract_message_id(incoming_frame_id);
+		//printf("Rx - ID: %u (0x%x) Size: %u	Msg: %s\n", incoming_frame_id&CAN_ERR_MASK, incoming_frame_id, data_size, receive_data);
 
   }while(1);
 
@@ -71,6 +69,8 @@ void unpack_obd2_response(obd2_response* response){
 		case ENGINE_COOLANT_TEMP:
 			unpack_engine_coolant(response->A);
 			break;
+		case ENGINE_RPM:
+			unpack_engine_rpm(response->A, response->B);
 		default:
 			break;
 	}
@@ -79,3 +79,7 @@ void unpack_obd2_response(obd2_response* response){
 void unpack_engine_coolant(char A){
 	printf("Engine coolant: %i Celsius\n", A-40);
 }/*unpack_engine_coolant*/
+
+void unpack_engine_rpm(char A, char B){
+	printf("Engine rpm: %u\n" , (A*256+B)/4);
+}/*unpack_engine_rpm*/
