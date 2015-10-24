@@ -30,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent)
 
   connected = false;
   this->statusBar()->showMessage("Welcome to Trionicnet Dashboard...");
+  this->setWindowTitle("Dasboard");
 }
 
 MainWindow::~MainWindow() {

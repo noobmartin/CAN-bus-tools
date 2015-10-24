@@ -7,7 +7,7 @@ Speedo::Speedo(QGraphicsScene *pScene, QObject *parent) :
   QGraphicsRectItem *pInsideRect = new QGraphicsRectItem(m_pRect, m_pScene);
   pInsideRect->setBrush(QBrush(Qt::red));
   pInsideRect->setPen(QPen(QColor(0,0,0,0)));
-  pInsideRect->setRect(0, 0, 75*2, 100);
+  pInsideRect->setRect(1, 1, 75*2-1, 99);
   m_pRect->setToolTip("Speedo");
 
   pInsideRect->setOpacity(1);
