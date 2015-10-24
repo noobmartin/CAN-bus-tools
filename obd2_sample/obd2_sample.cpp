@@ -4,12 +4,9 @@
 #include "../obd2/obd2pids.h"
 #include "../obd2/obd2modes.h"
 #include "../obd2/obd2can.h"
-#include "../obd2/utils.h"
+#include "../obd2/unpack.h"
 
 void unpack_data(unsigned int message_id, char* data, unsigned int data_size);
-void unpack_obd2_response(obd2_response* response);
-void unpack_engine_coolant(char A);
-void unpack_engine_rpm(char A, char B);
 
 int main(){
   canusb_devices::lawicel_canusb adapter;
@@ -63,23 +60,3 @@ void unpack_data(unsigned int message_id, char* data, unsigned int data_size){
 		unpack_obd2_response( (obd2_response*) data);
 	}/*if*/
 }/*unpack_data*/
-
-void unpack_obd2_response(obd2_response* response){
-	switch(response->pid){
-		case ENGINE_COOLANT_TEMP:
-			unpack_engine_coolant(response->A);
-			break;
-		case ENGINE_RPM:
-			unpack_engine_rpm(response->A, response->B);
-		default:
-			break;
-	}
-}/*unpack_obd2_response*/
-
-void unpack_engine_coolant(char A){
-	printf("Engine coolant: %i Celsius\n", A-40);
-}/*unpack_engine_coolant*/
-
-void unpack_engine_rpm(char A, char B){
-	printf("Engine rpm: %u\n" , (A*256+B)/4);
-}/*unpack_engine_rpm*/

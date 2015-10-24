@@ -1,6 +1,9 @@
 #ifndef OBD2_CAN_H
 #define	OBD2_CAN_H
 
+#include <linux/can.h>
+#include "obd2modes.h"
+
 /* @NOTE: A diagnostic reader requests data for a certain OBD-II mode and PID using CAN_OBD2_QUERY_MESSAGE_ID as identifier in the CAN Frame.
  * 				This CAN Frame identifier is used as a broadcast message.
  * 				The diagnostic reader may also transmit these requests directly to a specific unit on the bus, for which there may exist a total of eight units.
