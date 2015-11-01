@@ -5,3 +5,4 @@ dashboard/build-*
 *.o
 *moc*
 dashboard/dashboard
+*.swp
