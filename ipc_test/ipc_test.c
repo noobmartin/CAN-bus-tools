@@ -12,7 +12,7 @@ int main(){
   data_item_header  engine_torque   = {"Engine torque", Real32_Type};
   data_item_header  engine_speed    = {"Engine speed", Int16_Type};
 
-  int   ignition_angle_port = shm_open(port_ignition_angle_btdc, O_RDWR|O_CREAT, S_IROTH);
+  int   ignition_angle_port = shm_open(port_ignition_angle_btdc, O_RDWR|O_CREAT, S_IROTH| S_IRGRP| S_IRWXU);
   ftruncate(ignition_angle_port, sizeof(data_item_header)+4);
   void* ignition_angle_data = mmap(0, sizeof(data_item_header)+4, PROT_READ|PROT_WRITE, MAP_SHARED, ignition_angle_port, 0);
 
