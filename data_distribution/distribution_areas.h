@@ -1,6 +1,10 @@
 #ifndef DISTRIBUTION_AREAS_H
 #define DISTRIBUTION_AREAS_H
 
+void* setup_port(const char* port_name, int* port_handle, unsigned int port_size);
+void* get_port(const char* port_name, int* port_handle, unsigned int port_size);
+int close_port(const char* port_name, void* port_area, unsigned int port_size);
+
 #define DATA_ITEM_NAME_SIZE 256
 
 typedef enum{
@@ -50,12 +54,14 @@ typedef enum{
   Fraction,
   Metres_Per_Second,
   Newton_Metres,
-  Revolutions_Per_Second
+  Revolutions_Per_Second,
+  Degrees
 }data_unit;
 
 typedef struct{
   char                name[DATA_ITEM_NAME_SIZE];
   data_encapsulation  encapsulation;
+  data_unit           unit;
 }data_item_header;
 
 const char* port_ignition_angle_btdc                = "/ignition_angle";
