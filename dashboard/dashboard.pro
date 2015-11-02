@@ -14,9 +14,11 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    speedo.cpp
+    boxmeter.cpp \
+    testwidget.cpp
 
 HEADERS  += mainwindow.h \
-    speedo.h
+    boxmeter.h \
+    testwidget.h
 
 RESOURCES +=

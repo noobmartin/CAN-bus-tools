@@ -4,6 +4,7 @@
 #include <QtGui/QMainWindow>
 #include <QtGui/QGraphicsScene>
 #include <QtGui/QGraphicsView>
+#include <QtCore/QSharedMemory>
 
 class MainWindow : public QMainWindow {
   Q_OBJECT
@@ -17,6 +18,7 @@ private slots:
 private:
   QGraphicsScene  *m_pScene;
   QGraphicsView   *m_pView;
+  QSharedMemory   *m_pRpmMem;
   bool             connected;
 };
 
