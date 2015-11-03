@@ -10,6 +10,7 @@ void* setup_port(const char* port_name, int* port_handle, unsigned int port_size
 
   if(*port_handle == -1){
     perror("setup_port - shm_open");
+    printf("Port name: %s\n", port_name);
     return 0;
   }/*if*/
 
@@ -33,6 +34,7 @@ void* get_port(const char* port_name, int* port_handle, unsigned int port_size){
   *port_handle = shm_open(port_name, O_RDONLY, 0);
   if(*port_handle == -1){
     perror("get_port - shm_open");
+    printf("Port name: %s\n", port_name);
     return 0;
   }/*if*/
 
