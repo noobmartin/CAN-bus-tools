@@ -8,17 +8,26 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
+DEFINES += QT_POSIX_IPC
+
+DEPENDPATH += ../data_distribution
+INCLUDEPATH += ../data_distribution
+
 TARGET = dashboard
 TEMPLATE = app
 
+LIBS += -lrt
 
 SOURCES += main.cpp\
         mainwindow.cpp \
     boxmeter.cpp \
-    testwidget.cpp
+    testwidget.cpp \
+    sharedmemory.cpp \
+    ../data_distribution/distribution_areas.c
 
 HEADERS  += mainwindow.h \
     boxmeter.h \
-    testwidget.h
+    testwidget.h \
+    sharedmemory.h
 
 RESOURCES +=
