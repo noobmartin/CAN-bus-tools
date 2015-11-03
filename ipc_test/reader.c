@@ -7,6 +7,10 @@ int main(){
 
   void* rpm_data = get_port(port_engine_speed, &rpm_port, rpm_port_size);
 
+  if(rpm_data == 0){
+    return 0;
+  }/*if*/
+
   unsigned int* rpm = ((unsigned int*)rpm_data+sizeof(data_item_header));
 
   do{
