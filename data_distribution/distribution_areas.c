@@ -51,6 +51,7 @@ int close_port(char* port_name, void* port_area, unsigned int port_size){
   int result = munmap(port_area, port_size);
   if(result == -1){
     perror("close_port - munmap");
+    printf("Port name: %s\n", port_name);
     return result;
   }/*if*/
 

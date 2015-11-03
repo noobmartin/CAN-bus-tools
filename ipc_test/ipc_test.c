@@ -47,11 +47,10 @@ int main(){
   memcpy(engine_speed_data, &engine_speed, sizeof(data_item_header) );
 
   int i = 0;
-  for(; i < 100; i++){
+  for(; i < 1000000000; i++){
     update_rpm();
     update_ignition_angle();
     update_torque();
-    sleep(1);
   }
 
   sleep(5);

@@ -13,11 +13,11 @@ lawicel_canusb::lawicel_canusb(){
   ttyfd = 0x0;
   memset(tty_tx_buf, 0x0, MAX_TTY_TX_SIZE);
   memset(serial_device_path, 0x0, PATH_MAX);
-}
+}/*lawicel_canusb::lawicel_canusb*/
 
 lawicel_canusb::~lawicel_canusb(){
 
-}
+}/*lawicel_canusb::~lawicel_canusb*/
 
 int lawicel_canusb::find_lawicel_canusb_devices(){
   /*
@@ -38,19 +38,20 @@ int lawicel_canusb::find_lawicel_canusb_devices(){
     system("rm file");
 
     return 1;
-}
+}/*lawicel_canusb::find_lawicel_canusb_devices*/
 
 int lawicel_canusb::set_lawicel_canusb_device(const char* tty){
   if((ttyfd = open(tty, O_WRONLY | O_NOCTTY)) < 0){
     perror(tty);
     return 0;
-  }
+  }/*if*/
+
   return 1;
-}
+}/*lawicel_canusb::set_lawicel_canusb_device*/
 
 void lawicel_canusb::unset_lawicel_canusb_device(){
   close(ttyfd);
-}
+}/*lawicel_canusb::unset_lawicel_canusb_device*/
 
 int lawicel_canusb::set_lawicel_canusb_speed(can_speed Speed){
 	switch(Speed){
@@ -70,70 +71,77 @@ int lawicel_canusb::set_lawicel_canusb_speed(can_speed Speed){
 
   printf("Canusb speed set\n");
   return 1;
-}
+}/*lawicel_canusb::set_lawicel_canusb_speed*/
 
 int lawicel_canusb::create_lawicel_canusb_interface(){
   int ldisc = LDISC_N_SLCAN;
   if( ioctl(ttyfd, TIOCSETD, &ldisc) < 0){
     perror("Could not create interface");
     return 0;
-  }
+  }/*if*/
   else{
+
     if( ioctl(ttyfd, SIOCGIFNAME, interface_name) < 0){
       perror("Could not retreive interface name");
       return 0;
-    }
+    }/*if*/
     else{
       printf("Setting ethernet interface %s to UP\n", interface_name);
       int fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
 
       if(fd == -1){
         perror("Could not open socket");
-	return 0;
-      }
+	      return 0;
+      }/*if*/
 
       struct ifreq tifr;
       memcpy(tifr.ifr_name, interface_name, IFNAMSIZ);
       tifr.ifr_flags = IFF_UP|IFF_RUNNING|IFF_NOARP;
 
       if( ioctl(fd, SIOCSIFFLAGS, &tifr) == -1 ){
-	perror("Could not set socket options");
-	return 0;
-      }
+	      perror("Could not set socket options");
+	      return 0;
+      }/*if*/
 
       close(fd);
 
       return 1;
-    }
-  }
-}
+    }/*else*/
+
+  }/*else*/
+
+}/*lawicel_canusb::create_lawicel_canusb_interface*/
 
 int lawicel_canusb::delete_lawicel_canusb_interface(){
   int ldisc = N_TTY;
   if( ioctl(ttyfd, TIOCSETD, &ldisc) < 0){
     perror("Could not delete interface");
     return 0;
+  /*if*/
   }
+
   return 1;
-}
+}/*lawicel_canusb::delete_lawicel_canusb_interface*/
 
 int lawicel_canusb::open_lawicel_canusb(){
   sprintf(tty_tx_buf, "O\r");
   if( write(ttyfd, tty_tx_buf, strlen(tty_tx_buf)) < 0){
     perror("Could not open CAN bus");
     return 0;
-  }
+  }/*if*/
+
   return 1;
-}
+}/*lawicel_canusb::open_lawicel_canusb*/
 
 int lawicel_canusb::close_lawicel_canusb(){
   sprintf(tty_tx_buf, "C\r");
   if( write(ttyfd, tty_tx_buf, strlen(tty_tx_buf)) < 0){
     perror("Could not close CAN bus");
     return 0;
-  }
+  }/*if*/
+
   return 1;
-}
+}/*lawicel_canusb::close_lawicel_canusb*/
 
 void lawicel_canusb::auto_setup(){
   find_lawicel_canusb_devices();
@@ -142,6 +150,6 @@ void lawicel_canusb::auto_setup(){
   set_lawicel_canusb_speed(Kbit_500);
   open_lawicel_canusb();
   create_lawicel_canusb_interface();
-}
+}/*lawicel_canusb::auto_setup*/
 
-}
+}/*canusb_devices*/

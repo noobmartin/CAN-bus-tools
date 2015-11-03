@@ -98,6 +98,9 @@ class lawicel_canusb{
 
     void unset_lawicel_canusb_device();
 
+    /*
+     * Only use this if you are a lazy SOB.
+     */
     void auto_setup();
 };
 
