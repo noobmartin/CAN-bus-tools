@@ -7,7 +7,7 @@
 #include <time.h>
 #include <stdlib.h>
 
-#include "../data_distribution/distribution_areas.h"
+#include "data_distribution/distribution_areas.h"
 
 void* ignition_angle_data = NULL;
 void* engine_torque_data  = NULL;

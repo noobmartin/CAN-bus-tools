@@ -1,4 +1,4 @@
-#include "../data_distribution/distribution_areas.h"
+#include "data_distribution/distribution_areas.h"
 #include <stdio.h>
 
 int main(){

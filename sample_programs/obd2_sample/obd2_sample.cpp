@@ -1,10 +1,10 @@
-#include "../cannetwork/canbus.hpp"
-#include "../cannetwork/trionic5/messages.hpp"
-#include "../adaptercode/lawicel-canusb.hpp"
-#include "../obd2/obd2pids.h"
-#include "../obd2/obd2modes.h"
-#include "../obd2/obd2can.h"
-#include "../obd2/unpack.h"
+#include "cannetwork/canbus.hpp"
+#include "cannetwork/trionic5/messages.hpp"
+#include "adaptercode/lawicel-canusb.hpp"
+#include "obd2/obd2pids.h"
+#include "obd2/obd2modes.h"
+#include "obd2/obd2can.h"
+#include "obd2/unpack.h"
 
 #include <time.h>
 

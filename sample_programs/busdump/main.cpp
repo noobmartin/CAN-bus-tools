@@ -1,6 +1,6 @@
-#include "../cannetwork/canbus.hpp"
-#include "../cannetwork/trionic5/messages.hpp"
-#include "../adaptercode/lawicel-canusb.hpp"
+#include "cannetwork/canbus.hpp"
+#include "cannetwork/trionic5/messages.hpp"
+#include "adaptercode/lawicel-canusb.hpp"
 
 int main(){
   canusb_devices::lawicel_canusb adapter;
