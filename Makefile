@@ -1,6 +1,6 @@
 LIB_DIR=libraries
-CPP=g++ -g -std=c++11 -I$(LIB_DIR)
-CC=gcc
+CPP=g++ -g -std=c++11 -I$(LIB_DIR) -lrt
+CC=gcc -I$(LIB_DIR) -lrt
 CFLAGS=-I
 BIN=sample_programs/bin
 SAMPLES=sample_programs
@@ -16,3 +16,6 @@ dump_all:
 
 symboltable:
 	$(CC) -o $(BIN)/symbolextract $(SAMPLES)/tablebuilder/trionic5/symbolextract.c
+
+ipc_test:
+	$(CC) -o $(BIN)/ipc_master $(SAMPLES)/ipc_test/ipc_test.c $(LIB_DIR)/data_distribution/distribution_areas.c
