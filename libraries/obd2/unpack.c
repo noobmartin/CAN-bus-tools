@@ -1,5 +1,6 @@
 #include "unpack.h"
 #include "obd2pids.h"
+#include "obd2modes.h"
 
 #include <stdio.h>
 
@@ -14,16 +15,50 @@ bool is_obd2_response(unsigned int message_id){
 }/*is_obd2_response*/
 
 void unpack_obd2_response(obd2_response* response){
-	switch(response->pid){
+  switch(response->mode){
+    case SHOW_CURRENT_DATA:
+      unpack_obd2_show_current_data(response);
+      break;
+    case SHOW_FREEZE_FRAME_DATA:
+      break;
+    case SHOW_STORED_DIAGNOSTIC_TROUBLE_CODES:
+      unpack_obd2_show_stored_diagnostic_trouble_codes(response);
+      break;
+    case CLEAR_DIAGNOSTIC_TROUBLE_CODES:
+      break;
+    case TEST_RESULTS_NON_CAN:
+      break;
+    case TEST_RESULTS_CAN:
+      break;
+    case SHOW_PENDING_DIAGNOSTIC_TROUBLE_CODES:
+      break;
+    case CONTROL_OPERATION_OF_ONBOARD_SYSTEM:
+      break;
+    case REQUEST_VEHICLE_INFORMATION:
+      break;
+    case PERMANENT_DIAGNOSTIC_TROUBLE_CODES:
+      break;
+    default:
+      break;
+  }/*switch*/
+
+}/*unpack_obd2_response*/
+
+void unpack_obd2_show_current_data(obd2_response* data){
+	switch(data->pid){
 		case ENGINE_COOLANT_TEMP:
-			printf("Engine coolant: %i Celsius\n", unpack_engine_coolant(response->A));
+			printf("Engine coolant: %i Celsius\n", unpack_engine_coolant(data->A));
 			break;
 		case ENGINE_RPM:
-			printf("Engine rpm: %u\n" , unpack_engine_rpm(response->A, response->B));
+			printf("Engine rpm: %u\n" , unpack_engine_rpm(data->A, data->B));
 		default:
 			break;
-	}
-}/*unpack_obd2_response*/
+	}/*switch*/
+}/*unpack_obd2_show_current_data*/
+
+void unpack_obd2_show_stored_diagnostic_trouble_codes(obd2_response* data){
+
+}/*unpack_obd2_show_stored_diagnostic_trouble_codes*/
 
 int unpack_engine_coolant(char A){
 	int engine_coolant_temperature_centigrade = A-40;

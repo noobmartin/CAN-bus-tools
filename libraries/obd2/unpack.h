@@ -8,6 +8,8 @@
 bool is_obd2_response(unsigned int message_id);
 
 void unpack_obd2_response(obd2_response* response);
+void unpack_obd2_show_current_data(obd2_response* data);
+void unpack_obd2_show_stored_diagnostic_trouble_codes(obd2_response* data);
 
 int unpack_engine_coolant(char A);
 

@@ -19,3 +19,6 @@ symboltable:
 
 ipc_test:
 	$(CC) -o $(BIN)/ipc_master $(SAMPLES)/ipc_test/ipc_test.c $(LIB_DIR)/data_distribution/distribution_areas.c
+
+dtc:
+	$(CPP)	-o $(BIN)/dtc	$(SAMPLES)/diagnostic_trouble_codes/dtc.cpp $(LIB_DIR)/adaptercode/lawicel-canusb.cpp $(LIB_DIR)/cannetwork/canbus.cpp $(LIB_DIR)/obd2/utils.c $(LIB_DIR)/obd2/unpack.c
