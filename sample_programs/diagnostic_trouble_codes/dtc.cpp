@@ -3,6 +3,8 @@
 #include "obd2/obd2can.h"
 #include "obd2/unpack.h"
 
+#include <stdio.h>
+
 cannet::canbus  canbus;
 
 void initialize();
@@ -18,10 +20,30 @@ void initialize(){
 }/*initialize*/
 
 int main(){
-  initialize(); 
+  initialize();
+
+  do{
+    printf("Press enter to request DTC.\n");
+    int c = getchar();
+    request_dtcs();
+    printf("Transmitted DTC request.\n");
+    int i = 0;
+    for(; i < 1000; i++){
+      harvest_can_frames();
+    }
+  }while(1);
 }/*main*/
 
 void request_dtcs(){
+  struct can_frame  obd2_dtc_request;
+  obd2_dtc_request.can_id   = CAN_OBD2_QUERY_MESSAGE_ID_BROADCAST;
+  obd2_dtc_request.can_dlc  = 8;
+
+  obd2_request_dtc  dtc_request_data;
+
+  memcpy(obd2_dtc_request.data, &dtc_request_data, obd2_dtc_request.can_dlc);
+
+  canbus.send(&obd2_dtc_request);
 
 }/*request_dtcs*/
 

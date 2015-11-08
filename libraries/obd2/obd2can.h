@@ -3,6 +3,7 @@
 
 #include <linux/can.h>
 #include "obd2modes.h"
+#include "obd2pids.h"
 
 /* @NOTE: A diagnostic reader requests data for a certain OBD-II mode and PID using CAN_OBD2_QUERY_MESSAGE_ID as identifier in the CAN Frame.
  * 				This CAN Frame identifier is used as a broadcast message.
@@ -28,6 +29,17 @@ typedef struct{
 	char	D								= 0x55;
 	char	E								= 0x55;
 }obd2_request_current_data;
+
+typedef struct{
+  char  num_extra_bytes = CAN_OBD2_QUERY_SAE_STANDARD_DATA_LENGTH;
+  char  mode            = SHOW_STORED_DIAGNOSTIC_TROUBLE_CODES;
+  char  pid             = REQUEST_TROUBLE_CODES;
+  char  A               = 0x55;
+  char  B               = 0x55;
+  char  C               = 0x55;
+  char  D               = 0x55;
+  char  E               = 0x55;
+}obd2_request_dtc;
 
 typedef struct{
 	char	num_extra_bytes;

@@ -8,6 +8,7 @@ bool is_obd2_response(unsigned int message_id){
 	if( (message_id <= CAN_OBD2_RESPONSE_MESSAGE_ID_HIGH) &&
 			(message_id >= CAN_OBD2_RESPONSE_MESSAGE_ID_LOW))
 	{
+    printf("Found OBD-II response with ID 0x%x!\n", message_id);
 		return true;
 	}
 
@@ -17,6 +18,7 @@ bool is_obd2_response(unsigned int message_id){
 void unpack_obd2_response(obd2_response* response){
   switch(response->mode){
     case SHOW_CURRENT_DATA:
+      printf("Found SHOW_CURRENT_DATA!\n");
       unpack_obd2_show_current_data(response);
       break;
     case SHOW_FREEZE_FRAME_DATA:
@@ -33,12 +35,16 @@ void unpack_obd2_response(obd2_response* response){
     case SHOW_PENDING_DIAGNOSTIC_TROUBLE_CODES:
       break;
     case CONTROL_OPERATION_OF_ONBOARD_SYSTEM:
+      printf("Found CONTROL_OPERATION_OF_ONBOARD_SYSTEM\n");
       break;
     case REQUEST_VEHICLE_INFORMATION:
+      printf("Found REQUEST_VEHICLE_INFORMATION\n");
       break;
     case PERMANENT_DIAGNOSTIC_TROUBLE_CODES:
+      printf("Found PERMANENT_DIAGNOSTIC_TROUBLE_CODES\n");
       break;
     default:
+      printf("Found mode %i\n", response->mode);
       break;
   }/*switch*/
 
