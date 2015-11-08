@@ -16,7 +16,8 @@ bool is_obd2_response(unsigned int message_id){
 }/*is_obd2_response*/
 
 void unpack_obd2_response(obd2_response* response){
-  switch(response->mode){
+  char  response_mode = response->mode-MODE_RESPONSE_DELTA;
+  switch(response_mode){
     case SHOW_CURRENT_DATA:
       printf("Found SHOW_CURRENT_DATA!\n");
       unpack_obd2_show_current_data(response);
@@ -44,7 +45,7 @@ void unpack_obd2_response(obd2_response* response){
       printf("Found PERMANENT_DIAGNOSTIC_TROUBLE_CODES\n");
       break;
     default:
-      printf("Found mode %i\n", response->mode);
+      printf("Found mode 0x%x\n", response_mode);
       break;
   }/*switch*/
 
