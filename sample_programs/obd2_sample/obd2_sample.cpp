@@ -90,7 +90,6 @@ void send_data(){
 
 void unpack_data(unsigned int message_id, char* data, unsigned int data_size){
 	if(is_obd2_response(message_id)){
-		printf("Found OBD-II response!\n");
 		unpack_obd2_response( (obd2_response*) data);
 	}/*if*/
 }/*unpack_data*/
