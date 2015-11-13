@@ -10,8 +10,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 DEFINES += QT_POSIX_IPC
 
-DEPENDPATH += ../data_distribution
-INCLUDEPATH += ../data_distribution
+DEPENDPATH += ../../libraries/data_distribution
+INCLUDEPATH += ../../libraries/data_distribution
 
 TARGET = dashboard
 TEMPLATE = app
@@ -23,7 +23,7 @@ SOURCES += main.cpp\
     boxmeter.cpp \
     testwidget.cpp \
     sharedmemory.cpp \
-    ../data_distribution/distribution_areas.c
+    ../../libraries/data_distribution/distribution_areas.c
 
 HEADERS  += mainwindow.h \
     boxmeter.h \
