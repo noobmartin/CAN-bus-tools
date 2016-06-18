@@ -18,35 +18,36 @@ canbus::canbus(){
   memset(&receive_frame_filter, 0x0, sizeof(receive_frame_filter));
   memset(busname, 0x0, MAX_BUSNAME_SIZE);
   memset(&tx_buffer, 0x0, MAX_CYCLIC_TX_FRAMES*sizeof(can_frame)+sizeof(bcm_msg_head));
-}
+}/*canbus::canbus*/
 
 canbus::~canbus(){
 
-}
+}/*canbus::~canbus*/
 
 int canbus::set_busname(const unsigned size, const char* given_busname){
   if( (given_busname == 0) || size < 1){
     perror("Cannot not set busname");
     return -1;
-  }
+  }/*if*/
+
   memcpy(busname, given_busname, size);
-}
+}/*canbus::set_busname*/
 
 void canbus::set_receive_frame_filter(const unsigned int can_id, const unsigned int frame_mask){
   receive_frame_filter.can_id = can_id;
   receive_frame_filter.can_mask = frame_mask;
   setsockopt(bus_socket, SOL_CAN_RAW, CAN_RAW_FILTER, &receive_frame_filter, sizeof(receive_frame_filter));
-}
+}/*canbus::set_receive_frame_filter*/
 
 void canbus::disable_listening(void){
   setsockopt(bus_socket, SOL_CAN_RAW, CAN_RAW_FILTER, NULL, 0);
-}
+}/*canbus::disable_listening*/
 
 int canbus::open_bus(void){
   if( (bus_socket = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0){
     perror("Could not open socket");
     return -1;
-  }
+  }/*if*/
 
   strcpy(ifr.ifr_name, busname);
   ioctl(bus_socket, SIOCGIFINDEX, &ifr);
@@ -57,15 +58,16 @@ int canbus::open_bus(void){
   if(bind(bus_socket, (struct sockaddr*)&addr, sizeof(addr)) < 0){
     perror("Could not bind socket");
     return -2;
-  }
-}
+  }/*if*/
+
+}/*canbus::open_bus*/
 
 int canbus::open_cyclic_bus(void){
   bus_socket = socket(PF_CAN, SOCK_DGRAM, CAN_BCM);
   if( (bus_socket < 0)){
     perror("Could not open socket");
     return -1;
-  }
+  }/*if*/
 
   strcpy(ifr.ifr_name, busname);
   ioctl(bus_socket, SIOCGIFINDEX, &ifr);
@@ -76,12 +78,13 @@ int canbus::open_cyclic_bus(void){
   if(connect(bus_socket, (struct sockaddr*)&addr, sizeof(addr)) < 0){
     perror("Could not connect socket");
     return -2;
-  }
-}
+  }/*if*/
+
+}/*canbus::open_cyclic_bus*/
 
 int canbus::close_bus(void){
   close(bus_socket);
-}
+}/*canbus::close_bus*/
 
 int canbus::receive(const unsigned size, char* buf, unsigned int* can_id){
   int read_bytes = read(bus_socket, &read_frame, sizeof(read_frame));
@@ -89,20 +92,20 @@ int canbus::receive(const unsigned size, char* buf, unsigned int* can_id){
   if(read_bytes < 0){
     perror("CAN bus read returned < 0");
     return -1;
-  }
+  }/*if*/
   else{
     *can_id = read_frame.can_id;
     memcpy(buf, read_frame.data, read_frame.can_dlc);
-  }
+  }/*else*/
 
   return read_frame.can_dlc;
-}
+}/*canbus::receive*/
 
 int canbus::send(const unsigned int can_id, const unsigned size, const char* buf){
   if( (buf == 0) || (size < 1) || (size > 8) ){
     perror("Data is too large/small to send");
     return -1;
-  }
+  }/*if*/
 
   send_frame.can_id = can_id;
   memcpy(send_frame.data, buf, size);
@@ -111,17 +114,17 @@ int canbus::send(const unsigned int can_id, const unsigned size, const char* buf
   int written_bytes = write(bus_socket, &send_frame, sizeof(send_frame));
   if( written_bytes < size ){
     perror("Could not write all bytes");
-  }
+  }/*if*/
 
   return written_bytes;
 
-}
+}/*canbus::send*/
 
 int canbus::send(const can_frame* frame){
 	int written_bytes = write(bus_socket, frame, sizeof(can_frame));
 
 	return written_bytes;
-}
+}/*canbus::send*/
 
 void canbus::configure_cyclic_deaf_datapump(struct timeval cyclic_rate){
   tx_buffer.cyclic_header.opcode = 0x0;
@@ -134,7 +137,7 @@ void canbus::configure_cyclic_deaf_datapump(struct timeval cyclic_rate){
   tx_buffer.cyclic_header.ival1.tv_sec = 0x0;
   tx_buffer.cyclic_header.ival1.tv_usec = 0x0;
   tx_buffer.cyclic_header.ival2 = cyclic_rate;
-}
+}/*canbus::configure_cyclic_deaf_datapump*/
 
 void canbus::configure_cyclic_datapump_frames(unsigned int frames, frame_list_node first_frame_list_node){
   /* 
@@ -147,12 +150,13 @@ void canbus::configure_cyclic_datapump_frames(unsigned int frames, frame_list_no
   for(int i = 0; i < frames ; i++){
     memcpy(&tx_buffer.cyclic_frames[i], cur_frame_list_node->this_frame, sizeof(can_frame));
     cur_frame_list_node = cur_frame_list_node->next_frame_list_node;
-  }
-}
+  }/*for*/
+
+}/*canbus::configure_cyclic_datapump_frames*/
 
 void canbus::start_pumping_cyclic_data(void){
   write(bus_socket, &tx_buffer, sizeof(bcm_msg_head) + tx_buffer.cyclic_header.nframes*sizeof(can_frame));
-}
+}/*canbus::start_pumping_cyclic_data*/
 
 void canbus::stop_pumping_cyclic_data(void){
   struct bcm_msg_head stop_pumping_command;
@@ -161,6 +165,6 @@ void canbus::stop_pumping_cyclic_data(void){
   stop_pumping_command.can_id = tx_buffer.cyclic_header.can_id;
 
   write(bus_socket, &stop_pumping_command, sizeof(bcm_msg_head));
-}
+}/*canbus::stop_pumping_cyclic_data*/
 
 }

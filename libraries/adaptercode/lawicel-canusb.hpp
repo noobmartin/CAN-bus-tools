@@ -3,6 +3,10 @@
  * E-mail: superrajula@gmail.com
  * Description:
  *  This class tries to provide a high-level abstraction layer and helper functions for controlling the Lawicel CANUSB adapter.
+ *  In essence, what this class does is to find any attached Lawicel CANUSB adapter, and then transform that adapter into a
+ *  regular network interface adapter.
+ *
+ *  This makes it possible to use the regular socket mechanisms to transmit data to and receive data from a CAN.
  *
  * Kudos to:
  *  The guys and gals behind slcan_attach.c - a part of the set of userspace tools
