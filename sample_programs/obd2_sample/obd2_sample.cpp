@@ -30,7 +30,7 @@ int main(){
 void initialize(){
   canusb_devices::lawicel_canusb adapter;
   adapter.auto_setup();
-  canbus.set_busname(sizeof(adapter.interface_name), adapter.interface_name);
+  canbus.set_busname(IFNAMSIZ, adapter.get_interface_name());
 	canbus.open_bus();
 }/*initialize*/
 

@@ -13,7 +13,7 @@ int main(){
   adapter.auto_setup();
 
   cannet::canbus canbus;
-  canbus.set_busname(sizeof(adapter.interface_name), adapter.interface_name);
+  canbus.set_busname(IFNAMSIZ, adapter.get_interface_name());
 
   canbus.open_bus();
 

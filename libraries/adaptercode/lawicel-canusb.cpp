@@ -152,4 +152,8 @@ void lawicel_canusb::auto_setup(){
   create_lawicel_canusb_interface();
 }/*lawicel_canusb::auto_setup*/
 
+const char* lawicel_canusb::get_interface_name(void){
+  return interface_name;
+}/*lawicel_canusb::get_interface_name*/
+
 }/*canusb_devices*/

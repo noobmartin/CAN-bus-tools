@@ -2,6 +2,7 @@
  * Author: Alexander Rajula
  * E-mail: superrajula@gmail.com
  * Description:
+ *  This class tries to provide a high-level abstraction layer and helper functions for controlling the Lawicel CANUSB adapter.
  *
  * Kudos to:
  *  The guys and gals behind slcan_attach.c - a part of the set of userspace tools
@@ -46,12 +47,11 @@ class lawicel_canusb{
     int ttyfd;
     char tty_tx_buf[MAX_TTY_TX_SIZE];
     char serial_device_path[PATH_MAX];
+    char interface_name[IFNAMSIZ];
 
   public:
     lawicel_canusb();
     ~lawicel_canusb();
-    
-    char interface_name[IFNAMSIZ];
 
     /*
      * This function probes the system to find any attached LAWICEL CANUSB dongles.
@@ -67,7 +67,7 @@ class lawicel_canusb{
     int set_lawicel_canusb_device(const char* tty);
 
     /*
-     * This function sets the correct speed and TTY options to facilitate Trionic communication.
+     * This function sets the correct speed and TTY options to facilitate communication.
      * Returns 0 on failure.
      */
     int set_lawicel_canusb_speed(can_speed Speed);
@@ -85,7 +85,7 @@ class lawicel_canusb{
     int delete_lawicel_canusb_interface();
 
     /*
-     * Once the LAWICEL CANUSB dongle has been found, the communication to Trionic must be opened.
+     * Once the LAWICEL CANUSB dongle has been found, the communication bus must be opened before use.
      * Returns 0 on failure.
      */
     int open_lawicel_canusb();
@@ -102,6 +102,11 @@ class lawicel_canusb{
      * Only use this if you are a lazy SOB.
      */
     void auto_setup();
+
+    /*
+     * Use this if you want a pointer to the Ethernet interface name the Lawicel CANUSB adapter is mapped to.
+     */
+    const char* get_interface_name(void);
 };
 
 }
