@@ -51,6 +51,15 @@ int node::initialize(const char* canbus_name){
 
 }/*node::initialize*/
 
+int node::initialize_mute(void){
+  canbus::open_all();
+
+  for(int i = 0; i < number_of_provided_frame_identifiers; i++){
+    canbus::add_receive_frame_filter(provided_frame_identifiers[i], CAN_SFF_MASK);
+  }/*for*/
+
+}/*node::initialize_mute*/
+
 int get_provided_data(const unsigned size, char* data_buffer, unsigned int* identifier){
   return canbus::receive(size, data_buffer, identifier);
 }/*node::get_provided_data*/

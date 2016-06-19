@@ -30,8 +30,9 @@
 
 namespace can{
 
-#define MAX_BUSNAME_SIZE 	256
-#define MAX_CYCLIC_TX_FRAMES	256
+#define MAX_BUSNAME_SIZE 	        256
+#define MAX_CYCLIC_TX_FRAMES	    256
+#define MAX_RECEIVE_FRAME_FILTERS 256
 
 struct frame_list_node{
   can_frame* this_frame;
@@ -53,7 +54,8 @@ class bus{
      */
     struct can_frame send_frame;
     struct can_frame read_frame;
-    struct can_filter receive_frame_filter;
+    struct can_filter receive_frame_filter[MAX_RECEIVE_FRAME_FILTERS];
+    unsigned int receive_frame_filters;
 
     /*
      * This struct holds all data pertaining to the cyclic transmission of a set of CAN frames.
@@ -78,8 +80,14 @@ class bus{
     /* 
      * If you're not interested in listening to all the gossip on the bus, you may set a
      * frame filter, containing both CAN ID and CAD payload filter.
+     * Use this method if you only want to set up a single filter.
      */
     void set_receive_frame_filter(const unsigned int can_id, const unsigned int frame_mask);
+
+    /*
+     * If you want to add another frame filter to the list of frame filters, use this method.
+     */
+    int add_receive_frame_filter(const unsigned int can_id, const unsigned int frame_mask);
 
     /* 
      * Call this method if the socket will only be used to send frames.
@@ -91,6 +99,19 @@ class bus{
      * This call should be used when having configured a standard RAW CAN socket.
      */
     int open(void);
+
+    /*
+     * This call may be used when you don't care which interface this class is opened towards.
+     * This will bind the bus abstraction to all available CAN interfaces.
+     * Please note that sendto has to be used for transmission after calling this method to
+     * explicitly specify on which CAN interface the frame should be output.
+     */
+    int open_all(void);
+
+    /*
+     * This sets up a socket which is connected to the interface name set with set_name().
+     */
+    int open_cyclic(void);
 
     /*
      * This call applies to both kinds of CAN sockets.
@@ -118,11 +139,6 @@ class bus{
      */
     void start_pumping_cyclic_data(void);
     void stop_pumping_cyclic_data(void);
-
-    /*
-     * This sets up a socket which is connected to the interface name set with set_name().
-     */
-    int open_cyclic(void);
 
 };
 

@@ -69,6 +69,13 @@ class node{
     int initialize(const char* canbus_name);
 
     /*
+     * Performs the same function as initialize, but with one
+     * important difference - the node won't be able to output
+     * data on the bus.
+     */
+    int initialize_mute(void);
+
+    /*
      * Use this method to fetch data from this node.
      * The number of bytes fetched is returned.
      */

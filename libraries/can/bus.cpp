@@ -10,7 +10,9 @@
 namespace can{
 
 bus::bus(){
-  bus_socket = 0x0;
+  receive_frame_filters = 0x0;
+  bus_socket            = 0x0;
+
   memset(&ifr, 0x0, sizeof(ifr));
   memset(&addr, 0x0, sizeof(addr));
   memset(&send_frame, 0x0, sizeof(send_frame));
@@ -34,10 +36,27 @@ int bus::set_name(const unsigned size, const char* given_name){
 }/*bus::set_name*/
 
 void bus::set_receive_frame_filter(const unsigned int can_id, const unsigned int frame_mask){
-  receive_frame_filter.can_id = can_id;
-  receive_frame_filter.can_mask = frame_mask;
-  setsockopt(bus_socket, SOL_CAN_RAW, CAN_RAW_FILTER, &receive_frame_filter, sizeof(receive_frame_filter));
+  receive_frame_filters = 1;
+  receive_frame_filter[0].can_id    = can_id;
+  receive_frame_filter[0].can_mask  = frame_mask;
+
+  setsockopt(bus_socket, SOL_CAN_RAW, CAN_RAW_FILTER, &receive_frame_filter, receive_frame_filters*sizeof(can_filter));
 }/*bus::set_receive_frame_filter*/
+
+int bus::add_receive_frame_filter(const unsigned int can_id, const unsigned int frame_mask){
+  if(receive_frame_filters >= MAX_RECEIVE_FRAME_FILTERS){
+    perror("List of frame filters is full.");
+    return -1;
+  }/*if*/
+
+  receive_frame_filter[receive_frame_filters].can_id    = can_id;
+  receive_frame_filter[receive_frame_filters].can_mask  = frame_mask;
+  receive_frame_filters += 1;
+  
+  setsockopt(bus_socket, SOL_CAN_RAW, CAN_RAW_FILTER, &receive_frame_filter, receive_frame_filters*sizeof(can_filter));
+
+  return 0;
+}/*bus::add_receive_frame_filter*/
 
 void bus::disable_listening(void){
   setsockopt(bus_socket, SOL_CAN_RAW, CAN_RAW_FILTER, NULL, 0);
@@ -61,6 +80,27 @@ int bus::open(void){
   }/*if*/
 
 }/*bus::open*/
+
+int bus::open_all(void){
+  if( (bus_socket = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0){
+    perror("Could not open socket");
+    return -1;
+  }/*if*/
+
+  /*
+   * Note that this will bind the socket to all available CAN interfaces.
+   * This also means that *sendto* has to be used if frames shall be transmitted
+   * on the socket - frames will not be broadcasted to all CAN interfaces!
+   */
+  addr.can_ifindex  = 0;
+  addr.can_family   = PF_CAN;
+
+  if(bind(bus_socket, (struct sockaddr*)&addr, sizeof(addr)) < 0){
+    perror("Could not bind socket to all CAN interfaces!");
+    return -2;
+  }/*if*/
+
+}/*bus::open_all*/
 
 int bus::open_cyclic(void){
   bus_socket = socket(PF_CAN, SOCK_DGRAM, CAN_BCM);
