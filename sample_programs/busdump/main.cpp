@@ -1,13 +1,13 @@
-#include "cannetwork/canbus.hpp"
-#include "cannetwork/trionic5/messages.hpp"
-#include "adaptercode/lawicel-canusb.hpp"
+#include "can/bus.hpp"
+#include "can/trionic5/messages.hpp"
+#include "adapters/lawicel-canusb.hpp"
 
 int main(){
   canusb_devices::lawicel_canusb adapter;
   adapter.auto_setup();
 
-  cannet::canbus canbus;
-  canbus.set_busname(IFNAMSIZ, adapter.get_interface_name());
+  can::bus canbus;
+  canbus.set_name(IFNAMSIZ, adapter.get_interface_name());
 
   struct timeval pump_rate;
   pump_rate.tv_sec = 1;
@@ -22,13 +22,13 @@ int main(){
   cyclic_frame.can_dlc = 8;
   memcpy(cyclic_frame.data, data, 8);
 
-  cannet::frame_list_node fnode;
+  can::frame_list_node fnode;
   fnode.this_frame = &cyclic_frame;
   fnode.next_frame_list_node = 0;
 
   canbus.configure_cyclic_datapump_frames(1, fnode);
 
-  canbus.open_cyclic_bus();
+  canbus.open_cyclic();
   canbus.start_pumping_cyclic_data();
 
   unsigned int incoming_frame_id;

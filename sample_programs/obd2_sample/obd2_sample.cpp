@@ -1,6 +1,6 @@
-#include "cannetwork/canbus.hpp"
-#include "cannetwork/trionic5/messages.hpp"
-#include "adaptercode/lawicel-canusb.hpp"
+#include "can/bus.hpp"
+#include "can/trionic5/messages.hpp"
+#include "adapters/lawicel-canusb.hpp"
 #include "obd2/obd2pids.h"
 #include "obd2/obd2modes.h"
 #include "obd2/obd2can.h"
@@ -8,7 +8,7 @@
 
 #include <time.h>
 
-cannet::canbus canbus;
+can::bus canbus;
 
 void initialize();
 
@@ -30,8 +30,8 @@ int main(){
 void initialize(){
   canusb_devices::lawicel_canusb adapter;
   adapter.auto_setup();
-  canbus.set_busname(IFNAMSIZ, adapter.get_interface_name());
-	canbus.open_bus();
+  canbus.set_name(IFNAMSIZ, adapter.get_interface_name());
+	canbus.open();
 }/*initialize*/
 
 void receive_data(){

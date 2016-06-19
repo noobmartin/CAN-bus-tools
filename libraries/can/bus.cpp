@@ -5,11 +5,11 @@
  *   Implementation file for the canbus class.
  */
 
-#include "canbus.hpp"
+#include "bus.hpp"
 
-namespace cannet{
+namespace can{
 
-canbus::canbus(){
+bus::bus(){
   bus_socket = 0x0;
   memset(&ifr, 0x0, sizeof(ifr));
   memset(&addr, 0x0, sizeof(addr));
@@ -18,32 +18,32 @@ canbus::canbus(){
   memset(&receive_frame_filter, 0x0, sizeof(receive_frame_filter));
   memset(busname, 0x0, MAX_BUSNAME_SIZE);
   memset(&tx_buffer, 0x0, MAX_CYCLIC_TX_FRAMES*sizeof(can_frame)+sizeof(bcm_msg_head));
-}/*canbus::canbus*/
+}/*bus::bus*/
 
-canbus::~canbus(){
+bus::~bus(){
 
-}/*canbus::~canbus*/
+}/*bus::~bus*/
 
-int canbus::set_busname(const unsigned size, const char* given_busname){
-  if( (given_busname == 0) || size < 1){
-    perror("Cannot not set busname");
+int bus::set_name(const unsigned size, const char* given_name){
+  if( (given_name == 0) || size < 1){
+    perror("Cannot not set name");
     return -1;
   }/*if*/
 
-  memcpy(busname, given_busname, size);
-}/*canbus::set_busname*/
+  memcpy(busname, given_name, size);
+}/*bus::set_name*/
 
-void canbus::set_receive_frame_filter(const unsigned int can_id, const unsigned int frame_mask){
+void bus::set_receive_frame_filter(const unsigned int can_id, const unsigned int frame_mask){
   receive_frame_filter.can_id = can_id;
   receive_frame_filter.can_mask = frame_mask;
   setsockopt(bus_socket, SOL_CAN_RAW, CAN_RAW_FILTER, &receive_frame_filter, sizeof(receive_frame_filter));
-}/*canbus::set_receive_frame_filter*/
+}/*bus::set_receive_frame_filter*/
 
-void canbus::disable_listening(void){
+void bus::disable_listening(void){
   setsockopt(bus_socket, SOL_CAN_RAW, CAN_RAW_FILTER, NULL, 0);
-}/*canbus::disable_listening*/
+}/*bus::disable_listening*/
 
-int canbus::open_bus(void){
+int bus::open(void){
   if( (bus_socket = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0){
     perror("Could not open socket");
     return -1;
@@ -60,9 +60,9 @@ int canbus::open_bus(void){
     return -2;
   }/*if*/
 
-}/*canbus::open_bus*/
+}/*bus::open*/
 
-int canbus::open_cyclic_bus(void){
+int bus::open_cyclic(void){
   bus_socket = socket(PF_CAN, SOCK_DGRAM, CAN_BCM);
   if( (bus_socket < 0)){
     perror("Could not open socket");
@@ -80,13 +80,13 @@ int canbus::open_cyclic_bus(void){
     return -2;
   }/*if*/
 
-}/*canbus::open_cyclic_bus*/
+}/*bus::open_cyclic*/
 
-int canbus::close_bus(void){
-  close(bus_socket);
-}/*canbus::close_bus*/
+int bus::close(void){
+  ::close(bus_socket);
+}/*bus::close*/
 
-int canbus::receive(const unsigned size, char* buf, unsigned int* can_id){
+int bus::receive(const unsigned size, char* buf, unsigned int* can_id){
   int read_bytes = read(bus_socket, &read_frame, sizeof(read_frame));
 
   if(read_bytes < 0){
@@ -99,9 +99,9 @@ int canbus::receive(const unsigned size, char* buf, unsigned int* can_id){
   }/*else*/
 
   return read_frame.can_dlc;
-}/*canbus::receive*/
+}/*bus::receive*/
 
-int canbus::send(const unsigned int can_id, const unsigned size, const char* buf){
+int bus::send(const unsigned int can_id, const unsigned size, const char* buf){
   if( (buf == 0) || (size < 1) || (size > 8) ){
     perror("Data is too large/small to send");
     return -1;
@@ -118,15 +118,15 @@ int canbus::send(const unsigned int can_id, const unsigned size, const char* buf
 
   return written_bytes;
 
-}/*canbus::send*/
+}/*bus::send*/
 
-int canbus::send(const can_frame* frame){
+int bus::send(const can_frame* frame){
 	int written_bytes = write(bus_socket, frame, sizeof(can_frame));
 
 	return written_bytes;
-}/*canbus::send*/
+}/*bus::send*/
 
-void canbus::configure_cyclic_deaf_datapump(struct timeval cyclic_rate){
+void bus::configure_cyclic_deaf_datapump(struct timeval cyclic_rate){
   tx_buffer.cyclic_header.opcode = 0x0;
   tx_buffer.cyclic_header.opcode = TX_SETUP;
   
@@ -137,9 +137,9 @@ void canbus::configure_cyclic_deaf_datapump(struct timeval cyclic_rate){
   tx_buffer.cyclic_header.ival1.tv_sec = 0x0;
   tx_buffer.cyclic_header.ival1.tv_usec = 0x0;
   tx_buffer.cyclic_header.ival2 = cyclic_rate;
-}/*canbus::configure_cyclic_deaf_datapump*/
+}/*bus::configure_cyclic_deaf_datapump*/
 
-void canbus::configure_cyclic_datapump_frames(unsigned int frames, frame_list_node first_frame_list_node){
+void bus::configure_cyclic_datapump_frames(unsigned int frames, frame_list_node first_frame_list_node){
   /* 
    * Implicitly assume that all can_frame(s) have the same CAN ID, so we'll use that one!
    */
@@ -152,19 +152,19 @@ void canbus::configure_cyclic_datapump_frames(unsigned int frames, frame_list_no
     cur_frame_list_node = cur_frame_list_node->next_frame_list_node;
   }/*for*/
 
-}/*canbus::configure_cyclic_datapump_frames*/
+}/*bus::configure_cyclic_datapump_frames*/
 
-void canbus::start_pumping_cyclic_data(void){
+void bus::start_pumping_cyclic_data(void){
   write(bus_socket, &tx_buffer, sizeof(bcm_msg_head) + tx_buffer.cyclic_header.nframes*sizeof(can_frame));
-}/*canbus::start_pumping_cyclic_data*/
+}/*bus::start_pumping_cyclic_data*/
 
-void canbus::stop_pumping_cyclic_data(void){
+void bus::stop_pumping_cyclic_data(void){
   struct bcm_msg_head stop_pumping_command;
   memset(&stop_pumping_command, 0x0, sizeof(bcm_msg_head));
   stop_pumping_command.opcode = TX_DELETE;
   stop_pumping_command.can_id = tx_buffer.cyclic_header.can_id;
 
   write(bus_socket, &stop_pumping_command, sizeof(bcm_msg_head));
-}/*canbus::stop_pumping_cyclic_data*/
+}/*bus::stop_pumping_cyclic_data*/
 
 }

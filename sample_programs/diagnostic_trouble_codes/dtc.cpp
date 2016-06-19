@@ -1,11 +1,11 @@
-#include "adaptercode/lawicel-canusb.hpp"
-#include "cannetwork/canbus.hpp"
+#include "adapters/lawicel-canusb.hpp"
+#include "can/bus.hpp"
 #include "obd2/obd2can.h"
 #include "obd2/unpack.h"
 
 #include <stdio.h>
 
-cannet::canbus  canbus;
+can::bus  canbus;
 
 void initialize();
 void harvest_can_frames();
@@ -15,8 +15,8 @@ void look_for_dtc_response(unsigned int incoming_frame_id, char* data, unsigned 
 void initialize(){
   canusb_devices::lawicel_canusb  adapter;
   adapter.auto_setup();
-  canbus.set_busname(IFNAMSIZ, adapter.get_interface_name());
-  canbus.open_bus();
+  canbus.set_name(IFNAMSIZ, adapter.get_interface_name());
+  canbus.open();
 }/*initialize*/
 
 int main(){

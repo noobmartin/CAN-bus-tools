@@ -1,6 +1,6 @@
-#include "cannetwork/canbus.hpp"
-#include "cannetwork/trionic5/messages.hpp"
-#include "adaptercode/lawicel-canusb.hpp"
+#include "can/bus.hpp"
+#include "can/trionic5/messages.hpp"
+#include "adapters/lawicel-canusb.hpp"
 
 #include <time.h>
 
@@ -12,10 +12,10 @@ int main(){
   canusb_devices::lawicel_canusb adapter;
   adapter.auto_setup();
 
-  cannet::canbus canbus;
-  canbus.set_busname(IFNAMSIZ, adapter.get_interface_name());
+  can::bus canbus;
+  canbus.set_name(IFNAMSIZ, adapter.get_interface_name());
 
-  canbus.open_bus();
+  canbus.open();
 
 	struct timespec sleep_time;
 	sleep_time.tv_sec = 1;

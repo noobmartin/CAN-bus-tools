@@ -11,8 +11,8 @@
  *	Marc Kleine-Budde, Pengutronix
  */
 
-#ifndef _canbus_hpp_
-#define _canbus_hpp_
+#ifndef _bus_hpp_
+#define _bus_hpp_
 
 #include <stdio.h>
 #include <string.h>
@@ -28,7 +28,7 @@
 #include <linux/can/raw.h>
 #include <linux/can/bcm.h>
 
-namespace cannet{
+namespace can{
 
 #define MAX_BUSNAME_SIZE 	256
 #define MAX_CYCLIC_TX_FRAMES	256
@@ -43,7 +43,7 @@ struct cyclic_tx_buffer{
   struct can_frame cyclic_frames[MAX_CYCLIC_TX_FRAMES];
 };
 
-class canbus{
+class bus{
   private:
     int bus_socket;
 
@@ -66,14 +66,14 @@ class canbus{
     char busname[MAX_BUSNAME_SIZE];
 
   public:
-    canbus();
-    ~canbus();
+    bus();
+    ~bus();
 
     /* 
      * For the bind/connect operations to function, they will need a valid interface name.
      * This is the interface name which is output using the ifconfig command.
      */
-    int set_busname(const unsigned size, const char* busname);
+    int set_name(const unsigned size, const char* name);
 
     /* 
      * If you're not interested in listening to all the gossip on the bus, you may set a
@@ -90,12 +90,12 @@ class canbus{
     /*
      * This call should be used when having configured a standard RAW CAN socket.
      */
-    int open_bus(void);
+    int open(void);
 
     /*
      * This call applies to both kinds of CAN sockets.
      */
-    int close_bus(void);
+    int close(void);
 
     /*
      * These are operations which handle the reception and transmission of frames.
@@ -120,9 +120,9 @@ class canbus{
     void stop_pumping_cyclic_data(void);
 
     /*
-     * This sets up a socket which is connected to the interface name set with set_busname.
+     * This sets up a socket which is connected to the interface name set with set_name().
      */
-    int open_cyclic_bus(void);
+    int open_cyclic(void);
 
 };
 
