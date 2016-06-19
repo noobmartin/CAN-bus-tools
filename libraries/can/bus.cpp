@@ -207,4 +207,10 @@ void bus::stop_pumping_cyclic_data(void){
   write(bus_socket, &stop_pumping_command, sizeof(bcm_msg_head));
 }/*bus::stop_pumping_cyclic_data*/
 
+void bus::set_error_listening_only(void){
+  can_err_mask_t  error_mask  = CAN_ERR_MASK;
+
+  setsockopt(bus_socket, SOL_CAN_RAW, CAN_RAW_ERR_FILTER, &error_mask, sizeof(error_mask));
+}/*bus::set_error_listening_only*/
+
 }

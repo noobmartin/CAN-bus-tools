@@ -140,6 +140,11 @@ class bus{
     void start_pumping_cyclic_data(void);
     void stop_pumping_cyclic_data(void);
 
+    /*
+     * Call this method if you only want to receive error frames.
+     */
+    void set_error_listening_only(void);
+
 };
 
 }
