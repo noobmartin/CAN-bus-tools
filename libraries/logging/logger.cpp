@@ -161,8 +161,8 @@ int logger::set_network_output(unsigned int address, unsigned int port){
   }/*else*/
 
   if(success){
-    if(bind(network_output_descriptor, (sockaddr*)&network_output_address, sizeof(network_output_address)) == -1){
-      perror("Could not bind socket to destination.\n");
+    if(connect(network_output_descriptor, (sockaddr*)&network_output_address, sizeof(network_output_address)) == -1){
+      perror("Could not connect socket to destination.\n");
       printf("Attempted destination IPv4 address 0x%x and destination port 0x%x.\n", address, port);
       printf("Performing roll-back and closing socket.\n");
       unset_network_output();
@@ -245,11 +245,15 @@ void logger::log(const char* string, unsigned int length){
   }/*if*/
 
   if(file_output_enabled && file_output_available){
-    fwrite(log_string, 1, log_string_offset, file_output_descriptor);
+    if(fwrite(log_string, 1, log_string_offset, file_output_descriptor) == 0){
+      printf("Failed to write log data to file.\n");
+    }/*if*/
   }/*if*/
 
   if(network_output_enabled && network_output_available){
-    send(network_output_descriptor, log_string, log_string_offset, 0);
+    if(send(network_output_descriptor, log_string, log_string_offset, 0) == -1){
+      perror("Failed to send log data to network: ");
+    }/*if*/
   }/*if*/
 
 }/*logger::log*/
