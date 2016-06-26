@@ -6,7 +6,7 @@ BIN=sample_programs/bin
 SAMPLES=sample_programs
 
 obd:
-	$(CPP) -o $(BIN)/obd2 $(SAMPLES)/obd2_sample/obd2_sample.cpp $(LIB_DIR)/adapters/lawicel-canusb.cpp $(LIB_DIR)/can/bus.cpp $(LIB_DIR)/obd2/utils.c $(LIB_DIR)/obd2/unpack.c
+	$(CPP) -o $(BIN)/obd2 $(SAMPLES)/obd2_sample/obd2_sample.cpp $(LIB_DIR)/logging/logger.cpp $(LIB_DIR)/adapters/lawicel-canusb.cpp $(LIB_DIR)/can/bus.cpp $(LIB_DIR)/obd2/utils.c $(LIB_DIR)/obd2/unpack.c
 
 sample:
 	$(CPP) -o $(BIN)/sample $(SAMPLES)/busdump/main.cpp $(LIB_DIR)/adapters/lawicel-canusb.cpp $(LIB_DIR)/can/bus.cpp

@@ -14,6 +14,14 @@ lawicel_canusb::lawicel_canusb(){
   ttyfd = 0x0;
   memset(tty_tx_buf, 0x0, MAX_TTY_TX_SIZE);
   memset(serial_device_path, 0x0, PATH_MAX);
+
+  log.set_prefix(adapter_name, sizeof(adapter_name));
+  log.set_file_output("lawicel-log.txt");
+  log.set_network_output(0x7F000001, 31337);
+  log.enable_timestamping();
+  log.enable_data_destination(logging_services::Data_Destination_Type::Terminal);
+  log.enable_data_destination(logging_services::Data_Destination_Type::File);
+  log.enable_data_destination(logging_services::Data_Destination_Type::Network);
 }/*lawicel_canusb::lawicel_canusb*/
 
 lawicel_canusb::~lawicel_canusb(){
@@ -44,7 +52,7 @@ int lawicel_canusb::find_lawicel_canusb_devices(){
   fscanf(fd, "%s", serial_device_path);
 
   if(serial_device_path[0] == '\0'){
-    printf("%s: There does not seem to be an adapter connected to your computer.\n", adapter_name);
+    log.log("There does not seem to be an adapter connected to your computer.\n");
     printf("%s: If the adapter is really connected, make sure you have the appropriate device drivers installed.\n", adapter_name);
     printf("%s: You will need the usbserial and ftdi_sio drivers for the Linux kernel.\n", adapter_name);
     printf("%s: Please install these and try again!\n", adapter_name);
@@ -222,7 +230,7 @@ int lawicel_canusb::auto_setup(){
   }/*if*/
 
   if(set_lawicel_canusb_device(serial_device_path) == 0){
-    printf("%s: Failed to set Lawicel CANUSB device.\n", adapter_name);
+    printf("%s: Failed to select Lawicel CANUSB device.\n", adapter_name);
     return 0;
   }/*if*/
 

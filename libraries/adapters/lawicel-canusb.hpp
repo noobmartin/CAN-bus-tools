@@ -28,6 +28,7 @@
 #include <termios.h>
 #include <netinet/in.h>
 #include <linux/limits.h>
+#include "../logging/logger.hpp"
 
 namespace canusb_devices{
 
@@ -53,6 +54,8 @@ class lawicel_canusb{
     char serial_device_path[PATH_MAX];
     char interface_name[IFNAMSIZ];
     const char* adapter_name = "Lawicel CAN-USB adapter";
+
+    logging_services::logger  log;
 
   public:
     lawicel_canusb();

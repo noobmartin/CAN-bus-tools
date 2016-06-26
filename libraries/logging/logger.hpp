@@ -15,7 +15,9 @@
 
 namespace logging_services{
 
-#define MAX_PREFIX_STRING_LENGTH  256
+#define MAX_PREFIX_STRING_LENGTH 256
+#define MAX_LOG_STRING_LENGTH    2048
+#define MAX_TOTAL_LOG_STRING_LENGTH MAX_PREFIX_STRING_LENGTH+MAX_LOG_STRING_LENGTH
 
 typedef enum{
   Terminal  = 0,
@@ -25,7 +27,9 @@ typedef enum{
 
 class logger{
   private:
+    unsigned int prefix_length;
     char  prefix_string[MAX_PREFIX_STRING_LENGTH];
+    char  log_string[MAX_TOTAL_LOG_STRING_LENGTH];
 
     bool  terminal_output_enabled;
     bool  file_output_enabled;
@@ -36,6 +40,7 @@ class logger{
     bool  network_output_available;
 
     bool  insert_timestamp;
+    bool  insert_prefix;
 
     FILE* file_output_descriptor;
     int   network_output_descriptor;
@@ -72,7 +77,7 @@ class logger{
     int unset_file_output(void);
 
     /*
-     * This function gracefully unhooks network output
+     * This function gracefully unhooks network output.
      * Returns 0 on failure.
      */
     int unset_network_output(void);
@@ -97,6 +102,8 @@ class logger{
      */
     void disable_data_destination(Data_Destination_Type destination);
 
+    void log(const char* string);
+    void log(const char* string, unsigned int length);
 };
 
 }
