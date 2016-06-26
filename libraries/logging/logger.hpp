@@ -9,6 +9,8 @@
 #ifndef _logger_hpp_
 #define _logger_hpp_
 
+#include <stdio.h>
+
 namespace logging_services{
 
 #define MAX_PREFIX_STRING_LENGTH  256
@@ -27,7 +29,13 @@ class logger{
     bool  file_output_enabled;
     bool  network_output_enabled;
 
+    bool  file_output_available;
+    bool  terminal_output_available;
+    bool  network_output_available;
+
     bool  insert_timestamp;
+
+    FILE* file_output_descriptor;
   public:
     logger();
     ~logger();
@@ -41,6 +49,29 @@ class logger{
      * Returns 0 on failure.
      */
     int set_prefix(const char* string, unsigned int string_length);
+
+    /*
+     * This function enables selection of the file name which shall be used if outputting data to a file.
+     * Returns 0 on failure.
+     */
+    int set_file_output(const char* name);
+
+    /*
+     * This function enables selection of a destination IP/port pair to which the data shall be transmitted.
+     */
+    int set_network_output(unsigned int address, unsigned int port);
+
+    /*
+     * This function gracefully unhooks file output.
+     * Returns 0 on failure.
+     */
+    int unset_file_output(void);
+
+    /*
+     * This function gracefully unhooks network output
+     * Returns 0 on failure.
+     */
+    int unset_network_output(void);
 
     /*
      * This function enables insertion of a timestamp in all recorded data.

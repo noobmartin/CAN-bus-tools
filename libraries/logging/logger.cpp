@@ -16,7 +16,13 @@ logger::logger(){
   file_output_enabled     = false;
   network_output_enabled  = false;
 
-  insert_timestamp  = false;
+  terminal_output_available = true;
+  file_output_available     = false;
+  network_output_available  = false;
+
+  insert_timestamp          = false;
+
+  file_output_descriptor    = NULL;
 }/*logger::logger*/
 
 logger::~logger(){
@@ -67,5 +73,63 @@ void logger::disable_data_destination(Data_Destination_Type destination){
   }/*switch*/
 
 }/*logger::disable_data_destination*/
+
+void logger::enable_timestamping(void){
+  insert_timestamp = true;
+}/*logger::enable_timestamping*/
+
+void logger::disable_timestamping(void){
+  insert_timestamp = false;
+}/*logger::disable_timestamping*/
+
+int logger::set_file_output(const char* name){
+  if(name == NULL){
+    return 0;
+  }/*if*/
+
+  unset_file_output();
+
+  file_output_descriptor = fopen(name, "a");
+
+  if(file_output_descriptor == NULL){
+    file_output_available = false;
+    return 0;
+  }/*if*/
+  else{
+    file_output_available = true;
+  }/*else*/
+ 
+  return 1;
+}/*logger::set_file_output*/
+
+int logger::unset_file_output(void){
+  bool success = false;
+
+  if(file_output_descriptor == NULL){
+    return 0;
+  }/*if*/
+
+  file_output_available = false;
+
+  if(fclose(file_output_descriptor) == EOF){
+    perror("Tried to close file output but failed - continued usage is undefined.\n");
+    success = false;
+  }/*if*/
+  else{
+    success = true;
+  }/*else*/
+
+  file_output_descriptor = NULL;
+
+  return success;
+}/*logger::unset_file_output*/
+
+int logger::set_network_output(unsigned int address, unsigned int port){
+
+}/*logger::set_network_output*/
+
+int logger::unset_network_output(void){
+
+}/*logger::unset_network_output*/
 
 }
