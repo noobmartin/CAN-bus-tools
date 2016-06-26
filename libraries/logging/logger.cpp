@@ -170,12 +170,17 @@ int logger::set_network_output(unsigned int address, unsigned int port){
 }/*logger::set_network_output*/
 
 int logger::unset_network_output(void){
+  bool success = false;
+
   if(close(network_output_descriptor) == -1){
     perror("Failed to close socket.\n");
+    success = false;
   }/*if*/
 
   network_output_available = false;
+  success = true;
 
+  return success;
 }/*logger::unset_network_output*/
 
 }
