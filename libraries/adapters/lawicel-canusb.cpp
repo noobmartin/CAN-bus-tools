@@ -6,6 +6,7 @@
  */
 
 #include "lawicel-canusb.hpp"
+#include "errno.h"
 
 namespace canusb_devices{
 
@@ -29,20 +30,45 @@ int lawicel_canusb::find_lawicel_canusb_devices(){
    * to choose from.
    */
 
+  int success = -1;
+
   system("find /dev/serial/by-id/|grep LAWICEL > file");
 
   FILE* fd = fopen("file", "r");
-    fscanf(fd, "%s", serial_device_path);
-    printf("Found serial device path %s\n", serial_device_path);
-    fclose(fd);
-    system("rm file");
 
-    return 1;
+  if(fd == NULL){
+    perror("Could not open temporary file:");
+    return 0;
+  }/*if*/
+
+  fscanf(fd, "%s", serial_device_path);
+
+  if(serial_device_path[0] == '\0'){
+    printf("%s: There does not seem to be an adapter connected to your computer.\n", adapter_name);
+    printf("%s: If the adapter is really connected, make sure you have the appropriate device drivers installed.\n", adapter_name);
+    printf("%s: You will need the usbserial and ftdi_sio drivers for the Linux kernel.\n", adapter_name);
+    printf("%s: Please install these and try again!\n", adapter_name);
+    return 0;
+  }/*if*/
+
+  printf("%s: Found serial device path %s\n", adapter_name, serial_device_path);
+
+  success = fclose(fd);
+
+  if(success == EOF){
+    perror("Failed to close temporary file: ");
+    printf("%s: Will try to remove temporary file anyway...\n", adapter_name);
+  }/*if*/
+
+  system("rm file");
+
+  return 1;
 }/*lawicel_canusb::find_lawicel_canusb_devices*/
 
 int lawicel_canusb::set_lawicel_canusb_device(const char* tty){
   if((ttyfd = open(tty, O_WRONLY | O_NOCTTY)) < 0){
     perror(tty);
+    printf("%s: Are you sure you have read- and write permissions to this device?\n", adapter_name);
     return 0;
   }/*if*/
 
@@ -50,17 +76,61 @@ int lawicel_canusb::set_lawicel_canusb_device(const char* tty){
 }/*lawicel_canusb::set_lawicel_canusb_device*/
 
 void lawicel_canusb::unset_lawicel_canusb_device(){
-  close(ttyfd);
+  if(close(ttyfd) != 0){
+    perror("Failed to close tty file descriptor.");
+  }/*if*/
 }/*lawicel_canusb::unset_lawicel_canusb_device*/
 
 int lawicel_canusb::set_lawicel_canusb_speed(can_speed Speed){
+  sprintf(tty_tx_buf, "s4037\n");
+
+  printf("%s: BTR 0 set to 0x40\n", adapter_name);
+  printf("%s: BTR 1 set to 0x37\n", adapter_name);
+
+  char* configured_can_speed = NULL;
+
 	switch(Speed){
+    case Kbit_10:
+			sprintf(tty_tx_buf, "S0\n");
+      configured_can_speed = (char*)"10Kbit/s";
+      break;
+    case Kbit_20:
+			sprintf(tty_tx_buf, "S1\n");
+      configured_can_speed = (char*)"20Kbit/s";
+      break;
+    case Kbit_50:
+			sprintf(tty_tx_buf, "S2\n");
+      configured_can_speed = (char*)"50Kbit/s";
+      break;
+    case Kbit_100:
+			sprintf(tty_tx_buf, "S3\n");
+      configured_can_speed = (char*)"100Kbit/s";
+      break;
+    case Kbit_125:
+			sprintf(tty_tx_buf, "S4\n");
+      configured_can_speed = (char*)"125Kbit/s";
+      break;
+    case Kbit_250:
+			sprintf(tty_tx_buf, "S5\n");
+      configured_can_speed = (char*)"250Kbit/s";
+      break;
 		case Kbit_500:
-		  sprintf(tty_tx_buf, "s4037\n");
 			sprintf(tty_tx_buf, "S6\n");
+      configured_can_speed = (char*)"500Kbit/s";
+      break;
+    case Kbit_800:
+			sprintf(tty_tx_buf, "S7\n");
+      configured_can_speed = (char*)"800Kbit/s";
+      break;
+    case Mbit_1:
+			sprintf(tty_tx_buf, "S8\n");
+      configured_can_speed = (char*)"1Mbit/s";
+      break;
 		default:
 		  sprintf(tty_tx_buf, "s4037\r");
 			sprintf(tty_tx_buf, "S6\r");
+
+      configured_can_speed = (char*)"500Kbit/s";
 			break;
 	}/*switch*/
 
@@ -69,7 +139,7 @@ int lawicel_canusb::set_lawicel_canusb_speed(can_speed Speed){
     return 0;
   }/*if*/
 
-  printf("Canusb speed set\n");
+  printf("%s: Canusb speed set to %s\n", adapter_name, configured_can_speed);
   return 1;
 }/*lawicel_canusb::set_lawicel_canusb_speed*/
 
@@ -86,7 +156,7 @@ int lawicel_canusb::create_lawicel_canusb_interface(){
       return 0;
     }/*if*/
     else{
-      printf("Setting ethernet interface %s to UP\n", interface_name);
+      printf("%s: Setting virtual ethernet interface %s to UP\n", adapter_name, interface_name);
       int fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
 
       if(fd == -1){
@@ -103,7 +173,9 @@ int lawicel_canusb::create_lawicel_canusb_interface(){
 	      return 0;
       }/*if*/
 
-      close(fd);
+      if(close(fd) != 0){
+        perror("Failed to close socket");
+      }/*if*/
 
       return 1;
     }/*else*/
@@ -143,13 +215,38 @@ int lawicel_canusb::close_lawicel_canusb(){
   return 1;
 }/*lawicel_canusb::close_lawicel_canusb*/
 
-void lawicel_canusb::auto_setup(){
-  find_lawicel_canusb_devices();
-  set_lawicel_canusb_device(serial_device_path);
-	close_lawicel_canusb();
-  set_lawicel_canusb_speed(Kbit_500);
-  open_lawicel_canusb();
-  create_lawicel_canusb_interface();
+int lawicel_canusb::auto_setup(){
+  if(find_lawicel_canusb_devices() == 0){
+    printf("%s: Failed to find any Lawicel CANUSB adapters.\n", adapter_name);
+    return 0;
+  }/*if*/
+
+  if(set_lawicel_canusb_device(serial_device_path) == 0){
+    printf("%s: Failed to set Lawicel CANUSB device.\n", adapter_name);
+    return 0;
+  }/*if*/
+
+  if(close_lawicel_canusb() == 0){
+    printf("%s: Failed to close Lawicel CANUSB device.\n", adapter_name);
+    printf("%s: Is this expected? Why do we try to close before opening?\n", adapter_name);
+  }/*if*/
+
+  if(set_lawicel_canusb_speed(Kbit_500) == 0){
+    printf("%s: Failed to set Lawicel CANUSB speed.\n", adapter_name);
+    return 0;
+  }/*if*/
+
+  if(open_lawicel_canusb() == 0){
+    printf("%s: Failed to open Lawicel CANUSB device.\n", adapter_name);
+    return 0;
+  }/*if*/
+
+  if(create_lawicel_canusb_interface() == 0){
+    printf("%s: Failed to create virtual Lawicel CANUSB Ethernet interface.", adapter_name);
+    return 0;
+  }/*if*/
+
+  return 1;
 }/*lawicel_canusb::auto_setup*/
 
 const char* lawicel_canusb::get_interface_name(void){

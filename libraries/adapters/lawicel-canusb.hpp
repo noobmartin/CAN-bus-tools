@@ -52,6 +52,7 @@ class lawicel_canusb{
     char tty_tx_buf[MAX_TTY_TX_SIZE];
     char serial_device_path[PATH_MAX];
     char interface_name[IFNAMSIZ];
+    const char* adapter_name = "Lawicel CAN-USB adapter";
 
   public:
     lawicel_canusb();
@@ -104,8 +105,9 @@ class lawicel_canusb{
 
     /*
      * Only use this if you are a lazy SOB.
+     * Returns 0 on failure.
      */
-    void auto_setup();
+    int auto_setup();
 
     /*
      * Use this if you want a pointer to the Ethernet interface name the Lawicel CANUSB adapter is mapped to.
