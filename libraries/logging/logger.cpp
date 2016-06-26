@@ -23,6 +23,7 @@ logger::logger(){
   insert_timestamp          = false;
 
   file_output_descriptor    = NULL;
+  network_output_descriptor = 0;
 }/*logger::logger*/
 
 logger::~logger(){
@@ -125,10 +126,55 @@ int logger::unset_file_output(void){
 }/*logger::unset_file_output*/
 
 int logger::set_network_output(unsigned int address, unsigned int port){
+  bool success = false;
+  struct sockaddr_in network_output_address;
 
+  if( (port > 65535) || (port < 1) ){
+    printf("Invalid port number 0x%x - refusing to continue.\n", port);
+    return;
+  }/*if*/
+
+  unset_network_output();
+
+  memset(&network_output_address, 0x0, sizeof(network_output_address));
+
+  network_output_address.sin_family       = AF_INET;
+  network_output_address.sin_port         = htons(port);
+  network_output_address.sin_addr.s_addr  = htonl(address);
+
+  network_output_descriptor = socket(network_output_address.sin_family, SOCK_DGRAM | SOCK_NONBLOCK);
+  if(network_output_descriptor == -1){
+    perror("Could not create socket.\n");
+    success = false;
+  }/*if*/
+  else{
+    success = true;
+  }/*else*/
+
+  if(success){
+    if(bind(network_output_descriptor, &network_output_address, sizeof(network_output_address)) == -1){
+      perror("Could not bind socket to destination.\n");
+      printf("Attempted destination IPv4 address 0x%x and destination port 0x%x.\n", address, port);
+      printf("Performing roll-back and closing socket.\n");
+      unset_network_output();
+
+      success = false;
+    }/*if*/
+    else{
+      network_output_available  = true;
+      success                   = true;
+    }/*else*/
+  }/*if*/
+
+  return success;
 }/*logger::set_network_output*/
 
 int logger::unset_network_output(void){
+  if(close(network_output_descriptor) == -1){
+    perror("Failed to close socket.\n");
+  }/*if*/
+
+  network_output_available = false;
 
 }/*logger::unset_network_output*/
 

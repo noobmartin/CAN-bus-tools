@@ -10,6 +10,8 @@
 #define _logger_hpp_
 
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 
 namespace logging_services{
 
@@ -36,6 +38,8 @@ class logger{
     bool  insert_timestamp;
 
     FILE* file_output_descriptor;
+    int   network_output_descriptor;
+
   public:
     logger();
     ~logger();
