@@ -42,7 +42,7 @@ class logger{
     bool  insert_timestamp;
     bool  insert_prefix;
 
-    FILE* file_output_descriptor;
+    int   file_output_descriptor;
     int   network_output_descriptor;
 
   public:

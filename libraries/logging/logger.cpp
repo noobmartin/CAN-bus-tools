@@ -10,6 +10,7 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <errno.h>
+#include <fcntl.h>
 #include "logger.hpp"
 
 namespace logging_services{
@@ -30,7 +31,7 @@ logger::logger(){
   insert_timestamp          = false;
   insert_prefix             = false;
 
-  file_output_descriptor    = NULL;
+  file_output_descriptor    = 0;
   network_output_descriptor = 0;
 }/*logger::logger*/
 
@@ -100,9 +101,10 @@ int logger::set_file_output(const char* name){
 
   unset_file_output();
 
-  file_output_descriptor = fopen(name, "a");
+  file_output_descriptor = open(name, O_APPEND | O_WRONLY | O_CREAT);
 
-  if(file_output_descriptor == NULL){
+  if(file_output_descriptor == -1){
+    perror("Failed to open file");
     file_output_available = false;
     return 0;
   }/*if*/
@@ -116,13 +118,13 @@ int logger::set_file_output(const char* name){
 int logger::unset_file_output(void){
   bool success = false;
 
-  if(file_output_descriptor == NULL){
+  if(file_output_descriptor == 0){
     return 0;
   }/*if*/
 
   file_output_available = false;
 
-  if(fclose(file_output_descriptor) == EOF){
+  if(close(file_output_descriptor) == EOF){
     perror("Tried to close file output but failed - continued usage is undefined.\n");
     success = false;
   }/*if*/
@@ -130,7 +132,7 @@ int logger::unset_file_output(void){
     success = true;
   }/*else*/
 
-  file_output_descriptor = NULL;
+  file_output_descriptor = 0;
 
   return success;
 }/*logger::unset_file_output*/
@@ -242,9 +244,12 @@ void logger::log(const char* string, unsigned int length){
   }/*if*/
 
   if(file_output_enabled && file_output_available){
-    if(fwrite(log_string, 1, log_string_offset, file_output_descriptor) == 0){
-      printf("Failed to write log data to file.\n");
+    if(write(file_output_descriptor, log_string, strlen(log_string)) == -1){
+      perror("Failed to write log data to file");
     }/*if*/
+    else{
+      write(file_output_descriptor, "\n", 1);
+    }/*else*/
   }/*if*/
 
   if(network_output_enabled && network_output_available){
