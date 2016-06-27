@@ -18,7 +18,7 @@ lawicel_canusb::lawicel_canusb(){
   log.set_prefix(adapter_name, strlen(adapter_name));
   log.set_file_output("lawicel-log.txt");
   log.set_network_output(0x7F000001, 31337);
-  log.disable_timestamping();
+  log.enable_timestamping();
   log.enable_prefix();
   log.enable_data_destination(logging_services::Data_Destination_Type::Terminal);
   log.enable_data_destination(logging_services::Data_Destination_Type::File);

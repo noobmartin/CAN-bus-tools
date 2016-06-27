@@ -207,27 +207,23 @@ void logger::log(const char* string, unsigned int length){
   unsigned int log_string_offset = 0;
 
   if(insert_timestamp){
-    char  seconds[4]  = {'0','0','0','0'};
-    char  useconds[5] = {'0','0','0','0','0'};
+    char  seconds[8]  = {'0','0','0','0'};
+    char  useconds[8] = {'0','0','0','0','0'};
 
     struct timeval current_time;
     if(gettimeofday(&current_time, NULL) == -1){
       perror("Failed to retrieve current time - will insert zeroes instead.\n");
     }/*if*/
     else{
-      
+      snprintf(seconds, 8, "%lx", current_time.tv_sec);
+      snprintf(useconds, 8, "%lx", current_time.tv_usec);
     }/*else*/
 
-    memcpy(&log_string[log_string_offset], seconds, 4);
-    log_string_offset += 4;
-    log_string[log_string_offset] = '.';
-    log_string_offset += 1;
-    memcpy(&log_string[log_string_offset], useconds, 5);
-    log_string_offset += 5;
-    log_string[log_string_offset] = ':';
-    log_string_offset += 1;
-    log_string[log_string_offset] = ' ';
-    log_string_offset += 1;
+    strcat(log_string, seconds);
+    strcat(log_string, ".");
+    strcat(log_string, useconds);
+    strcat(log_string, ": ");
+
   }/*if*/
 
   /* @NOTE: This could be made cheaper since the prefix is typically not changed during runtime.
@@ -235,18 +231,11 @@ void logger::log(const char* string, unsigned int length){
    *        time.
    */
   if(insert_prefix){
-    memcpy(&log_string[log_string_offset], prefix_string, prefix_length);
-    log_string_offset += prefix_length;
-    log_string[log_string_offset] = ':';
-    log_string_offset += 1;
-    log_string[log_string_offset] = ' ';
-    log_string_offset += 1;
+    strcat(log_string, prefix_string);
+    strcat(log_string, ": ");
   }/*if*/
 
-  memcpy(&log_string[log_string_offset], string, length);
-  log_string_offset += length;
-
-  log_string[log_string_offset] = '\0';
+  strcat(log_string, string);
 
   if(terminal_output_enabled && terminal_output_available){
     puts(log_string);
