@@ -92,6 +92,10 @@ class logger{
      */
     void disable_timestamping(void);
 
+    void enable_prefix(void);
+
+    void disable_prefix(void);
+
     /*
      * This function turns on distribution of data to a specific type of destination.
      */

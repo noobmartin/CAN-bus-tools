@@ -9,6 +9,7 @@
 #include <sys/time.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include <errno.h>
 #include "logger.hpp"
 
 namespace logging_services{
@@ -223,7 +224,9 @@ void logger::log(const char* string, unsigned int length){
     log_string_offset += 1;
     memcpy(&log_string[log_string_offset], useconds, 5);
     log_string_offset += 5;
-    log_string[log_string_offset] = '|';
+    log_string[log_string_offset] = ':';
+    log_string_offset += 1;
+    log_string[log_string_offset] = ' ';
     log_string_offset += 1;
   }/*if*/
 
@@ -234,9 +237,14 @@ void logger::log(const char* string, unsigned int length){
   if(insert_prefix){
     memcpy(&log_string[log_string_offset], prefix_string, prefix_length);
     log_string_offset += prefix_length;
-    log_string[log_string_offset] = '|';
+    log_string[log_string_offset] = ':';
+    log_string_offset += 1;
+    log_string[log_string_offset] = ' ';
     log_string_offset += 1;
   }/*if*/
+
+  memcpy(&log_string[log_string_offset], string, length);
+  log_string_offset += length;
 
   log_string[log_string_offset] = '\0';
 
@@ -252,10 +260,30 @@ void logger::log(const char* string, unsigned int length){
 
   if(network_output_enabled && network_output_available){
     if(send(network_output_descriptor, log_string, log_string_offset, 0) == -1){
-      perror("Failed to send log data to network: ");
+      switch(errno){
+        case ECONNREFUSED:
+          /* Don't print nuisance errors if the destination is not up.
+           * This error is typically thrown if an ICMP message is received
+           * telling us that "Destination unreachable" or something like that.
+           * If that's the case, ignore the error.
+           * Hm, perhaps the user should be notified...
+           */
+          break;
+        default:
+          perror("Failed to send log data to network");
+          break;
+      }/*switch*/
     }/*if*/
   }/*if*/
 
 }/*logger::log*/
+
+void logger::enable_prefix(void){
+  insert_prefix = true;
+}/*logger::enable_prefix*/
+
+void logger::disable_prefix(void){
+  insert_prefix = false;
+}/*logger::disable_prefix*/
 
 }
