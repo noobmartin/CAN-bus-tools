@@ -66,9 +66,10 @@ class logger{
     int set_file_output(const char* name);
 
     /*
-     * This function enables selection of a destination IP/port pair to which the data shall be transmitted.
+     * These functions enable selection of a destination IP/port pair to which the data shall be transmitted.
      */
     int set_network_output(unsigned int address, unsigned int port);
+    int set_network_output(const char* address, unsigned int port);
 
     /*
      * This function gracefully unhooks file output.

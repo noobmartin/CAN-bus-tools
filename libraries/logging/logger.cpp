@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <netdb.h>
 #include "logger.hpp"
 
 namespace logging_services{
@@ -137,6 +138,23 @@ int logger::unset_file_output(void){
   return success;
 }/*logger::unset_file_output*/
 
+int logger::set_network_output(const char* string, unsigned int port){
+  unsigned int address = 0x0;
+
+  struct addrinfo* result;
+
+  if(getaddrinfo(string, NULL, NULL, &result) == 0){
+    struct sockaddr_in* socket_address = (sockaddr_in*)result->ai_addr;
+    set_network_output(socket_address->sin_addr.s_addr, port);
+  }/*if*/
+  else{
+    printf("Failed to resolve the IP address of host %s.\n", string);
+  }/*else*/
+
+  freeaddrinfo(result);
+
+}/*logger::set_network_output*/
+
 int logger::set_network_output(unsigned int address, unsigned int port){
   bool success = false;
   struct sockaddr_in network_output_address;
@@ -206,8 +224,6 @@ void logger::log(const char* string, unsigned int length){
 
   memset(log_string, 0x0, MAX_TOTAL_LOG_STRING_LENGTH);
 
-  unsigned int log_string_offset = 0;
-
   if(insert_timestamp){
     char  seconds[8]  = {'0','0','0','0'};
     char  useconds[8] = {'0','0','0','0','0'};
@@ -253,7 +269,7 @@ void logger::log(const char* string, unsigned int length){
   }/*if*/
 
   if(network_output_enabled && network_output_available){
-    if(send(network_output_descriptor, log_string, log_string_offset, 0) == -1){
+    if(send(network_output_descriptor, log_string, strlen(log_string), 0) == -1){
       switch(errno){
         case ECONNREFUSED:
           /* Don't print nuisance errors if the destination is not up.
