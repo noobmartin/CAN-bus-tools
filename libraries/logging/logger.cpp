@@ -233,8 +233,8 @@ void logger::log(const char* string, unsigned int length){
       perror("Failed to retrieve current time - will insert zeroes instead.\n");
     }/*if*/
     else{
-      snprintf(seconds, 8, "%lx", current_time.tv_sec);
-      snprintf(useconds, 8, "%lx", current_time.tv_usec);
+      snprintf(seconds, 11, "%lu", current_time.tv_sec);
+      snprintf(useconds, 11, "%lu", current_time.tv_usec);
     }/*else*/
 
     strcat(log_string, seconds);

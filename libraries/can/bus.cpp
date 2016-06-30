@@ -100,6 +100,8 @@ int bus::open_all(void){
     return -2;
   }/*if*/
 
+  return 1;
+
 }/*bus::open_all*/
 
 int bus::open_cyclic(void){
