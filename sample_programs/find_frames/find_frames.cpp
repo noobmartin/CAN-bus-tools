@@ -4,6 +4,8 @@
  *              The program may be useful if you're unsure which action triggers which CAN frame.
  */
 
+#include <vector>
+
 #include "can/bus.hpp"
 #include "adapters/lawicel-canusb.hpp"
 #include "logging/logger.hpp"
@@ -70,14 +72,21 @@ int do_stuff(can::bus* bus, logging_services::logger* log){
 }/*do_stuff*/
 
 void parse_frame(unsigned int can_frame_id, char* buffer, logging_services::logger* log){
-  /* @TODO: Parse through a list of can_frame IDs.
-   *        If can_frame_id is not in the list, something interesting has happened!
-   */
+  static std::vector<unsigned int>  identified_can_frames;
 
-  bool new_frame = false;
+  bool new_frame = true;
+
+  for(unsigned int n : identified_can_frames){
+    if(can_frame_id == n){
+      new_frame = false;
+    }/*if*/
+  }/*for*/
 
   if(new_frame){
-    log->log("Received new CAN frame type!");
+    log->log("Received new CAN frame identifier:");
+    log->log(can_frame_id);
+
+    identified_can_frames.push_back(can_frame_id);
   }/*if*/
 
   return;

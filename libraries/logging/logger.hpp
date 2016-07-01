@@ -109,6 +109,9 @@ class logger{
 
     void log(const char* string);
     void log(const char* string, unsigned int length);
+    void log(unsigned int parameter);
+    void log(int parameter);
+    void log(float parameter);
 };
 
 }
