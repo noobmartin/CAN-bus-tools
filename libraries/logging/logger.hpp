@@ -4,6 +4,8 @@
  * Description:
  *  This class enables an application to log data.
  *  The data may be output to a terminal, to a file, to a network or all of these combined.
+ *
+ *  The class may seem bloated, but so what...
  */
 
 #ifndef _logger_hpp_
@@ -114,6 +116,9 @@ class logger{
     void log(unsigned int parameter);
     void log(int parameter);
     void log(float parameter);
+
+    /* Logs a byte array one byte at a time as hexadecimal values.  */
+    void log_byte_array(const char* byte_array, const unsigned int length);
 };
 
 }

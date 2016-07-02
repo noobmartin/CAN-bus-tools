@@ -5,6 +5,7 @@
  *   Implementation file for the logger class.
  */
 
+#include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
 #include <netinet/in.h>
@@ -308,6 +309,22 @@ void logger::log(float parameter){
 
   log(log_number);
 }/*logger::log*/
+
+void logger::log_byte_array(const char* byte_array, const unsigned int length){
+  /* I hate dynamic memory allocation. */
+  char* byte_array_string = (char*)malloc(length);
+
+  if(byte_array_string != NULL){
+    for(unsigned int i = 0; i < length; i++){
+       snprintf(&byte_array_string[i], 1, "%x", byte_array[i]);
+    }/*for*/
+
+    log(byte_array_string);
+
+    free(byte_array_string);
+  }/*if*/
+
+}/*logger::log_byte_array*/
 
 void logger::enable_prefix(void){
   insert_prefix = true;

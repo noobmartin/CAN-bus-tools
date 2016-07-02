@@ -85,6 +85,7 @@ void parse_frame(unsigned int can_frame_id, char* buffer, logging_services::logg
   if(new_frame){
     log->log("Received new CAN frame identifier:");
     log->log(can_frame_id);
+    log->log_byte_array(buffer, 8);
 
     identified_can_frames.push_back(can_frame_id);
   }/*if*/
