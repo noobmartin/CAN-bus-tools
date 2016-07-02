@@ -22,7 +22,7 @@ lawicel_canusb::lawicel_canusb(){
   log.enable_prefix();
   log.enable_data_destination(logging_services::Data_Destination_Type::Terminal);
   log.enable_data_destination(logging_services::Data_Destination_Type::File);
-  log.enable_data_destination(logging_services::Data_Destination_Type::Network);
+  log.disable_data_destination(logging_services::Data_Destination_Type::Network);
 }/*lawicel_canusb::lawicel_canusb*/
 
 lawicel_canusb::~lawicel_canusb(){

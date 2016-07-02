@@ -146,12 +146,12 @@ int logger::set_network_output(const char* string, unsigned int port){
   if(getaddrinfo(string, NULL, NULL, &result) == 0){
     struct sockaddr_in* socket_address = (sockaddr_in*)result->ai_addr;
     set_network_output(socket_address->sin_addr.s_addr, port);
+
+    freeaddrinfo(result);
   }/*if*/
   else{
     printf("Failed to resolve the IP address of host %s.\n", string);
   }/*else*/
-
-  freeaddrinfo(result);
 
 }/*logger::set_network_output*/
 
