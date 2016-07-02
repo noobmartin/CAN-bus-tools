@@ -15,8 +15,9 @@
 
 namespace logging_services{
 
-#define MAX_PREFIX_STRING_LENGTH 256
-#define MAX_LOG_STRING_LENGTH    2048
+#define MAX_PREFIX_STRING_LENGTH  256
+#define MAX_LOG_STRING_LENGTH     2048
+#define MAX_LOG_NUMBER_LENGTH     128
 #define MAX_TOTAL_LOG_STRING_LENGTH MAX_PREFIX_STRING_LENGTH+MAX_LOG_STRING_LENGTH
 
 typedef enum{
@@ -30,6 +31,7 @@ class logger{
     unsigned int prefix_length;
     char  prefix_string[MAX_PREFIX_STRING_LENGTH];
     char  log_string[MAX_TOTAL_LOG_STRING_LENGTH];
+    char  log_number[MAX_LOG_NUMBER_LENGTH];
 
     bool  terminal_output_enabled;
     bool  file_output_enabled;

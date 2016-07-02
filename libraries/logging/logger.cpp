@@ -289,27 +289,24 @@ void logger::log(const char* string, unsigned int length){
 }/*logger::log*/
 
 void logger::log(unsigned int parameter){
-  char string_representation[128];
-  memset(string_representation, 0x0, 128);
-  snprintf(string_representation, 128, "%u", parameter);
+  memset(log_number, 0x0, MAX_LOG_NUMBER_LENGTH);
+  snprintf(log_number, MAX_LOG_NUMBER_LENGTH, "%u", parameter);
 
-  log(string_representation);
+  log(log_number);
 }/*logger::log*/
 
 void logger::log(int parameter){
-  char  string_representation[128];
-  memset(string_representation, 0x0, 128);
-  snprintf(string_representation, 128, "%i", parameter);
+  memset(log_number, 0x0, MAX_LOG_NUMBER_LENGTH);
+  snprintf(log_number, MAX_LOG_NUMBER_LENGTH, "%i", parameter);
 
-  log(string_representation);
+  log(log_number);
 }/*logger::log*/
 
 void logger::log(float parameter){
-  char  string_representation[128];
-  memset(string_representation, 0x0, 128);
-  snprintf(string_representation, 128, "%f", parameter);
+  memset(log_number, 0x0, MAX_LOG_NUMBER_LENGTH);
+  snprintf(log_number, MAX_LOG_NUMBER_LENGTH, "%f", parameter);
 
-  log(string_representation);
+  log(log_number);
 }/*logger::log*/
 
 void logger::enable_prefix(void){
