@@ -76,7 +76,7 @@ int lawicel_canusb::find_lawicel_canusb_devices(){
 }/*lawicel_canusb::find_lawicel_canusb_devices*/
 
 int lawicel_canusb::set_lawicel_canusb_device(const char* tty){
-  if((ttyfd = open(tty, O_WRONLY | O_NOCTTY)) < 0){
+  if((ttyfd = open(tty, O_RDWR | O_NOCTTY)) < 0){
     perror(tty);
     log.log("Are you sure you have read- and write permissions to this device?");
     return 0;
@@ -92,48 +92,68 @@ void lawicel_canusb::unset_lawicel_canusb_device(){
 }/*lawicel_canusb::unset_lawicel_canusb_device*/
 
 int lawicel_canusb::set_lawicel_canusb_speed(can_speed Speed){
-  sprintf(tty_tx_buf, "s4037\n");
+  sprintf(tty_tx_buf, "s4037\r");
+  
+  if( write(ttyfd, tty_tx_buf, strlen(tty_tx_buf)) < 0 ){
+    perror("Could not set canusb speed");
+    return 0;
+  }/*if*/
 
-  log.log("BTR 0 set to 0x40");
-  log.log("BTR 1 set to 0x37");
+  char recv_buf[128];
+
+  if(read(ttyfd, recv_buf, 128) == -1){
+    perror("Failed to read response from adapter: ");
+  }/*if*/
+  else{
+    switch(recv_buf[0]){
+      case '\r':
+        log.log("BTR 0 set to 0x40");
+        log.log("BTR 1 set to 0x37");
+        break;
+      default:
+        log.log("Lawicel failed to set BTR flags. ");
+        log.log("Response from adapter was: 0x%x\n", recv_buf[0]);
+        break;
+    }/*switch*/
+  }/*else*/
 
   char* configured_can_speed = NULL;
 
 	switch(Speed){
     case Kbit_10:
-			sprintf(tty_tx_buf, "S0\n");
+			sprintf(tty_tx_buf, "S0\r");
       configured_can_speed = (char*)"10Kbit/s";
       break;
     case Kbit_20:
-			sprintf(tty_tx_buf, "S1\n");
+			sprintf(tty_tx_buf, "S1\r");
       configured_can_speed = (char*)"20Kbit/s";
       break;
     case Kbit_50:
-			sprintf(tty_tx_buf, "S2\n");
+			sprintf(tty_tx_buf, "S2\r");
       configured_can_speed = (char*)"50Kbit/s";
       break;
     case Kbit_100:
-			sprintf(tty_tx_buf, "S3\n");
+			sprintf(tty_tx_buf, "S3\r");
       configured_can_speed = (char*)"100Kbit/s";
       break;
     case Kbit_125:
-			sprintf(tty_tx_buf, "S4\n");
+			sprintf(tty_tx_buf, "S4\r");
       configured_can_speed = (char*)"125Kbit/s";
       break;
     case Kbit_250:
-			sprintf(tty_tx_buf, "S5\n");
+			sprintf(tty_tx_buf, "S5\r");
       configured_can_speed = (char*)"250Kbit/s";
       break;
 		case Kbit_500:
-			sprintf(tty_tx_buf, "S6\n");
+			sprintf(tty_tx_buf, "S6\r");
       configured_can_speed = (char*)"500Kbit/s";
       break;
     case Kbit_800:
-			sprintf(tty_tx_buf, "S7\n");
+			sprintf(tty_tx_buf, "S7\r");
       configured_can_speed = (char*)"800Kbit/s";
       break;
     case Mbit_1:
-			sprintf(tty_tx_buf, "S8\n");
+			sprintf(tty_tx_buf, "S8\r");
       configured_can_speed = (char*)"1Mbit/s";
       break;
 		default:
@@ -149,8 +169,21 @@ int lawicel_canusb::set_lawicel_canusb_speed(can_speed Speed){
     return 0;
   }/*if*/
 
-  log.log("Canusb speed set to:");
-  log.log(configured_can_speed);
+  if(read(ttyfd, recv_buf, 128) == -1){
+    perror("Failed to read response from adapter: ");
+  }/*if*/
+  else{
+    switch(recv_buf[0]){
+      case '\r':
+        log.log("Canusb speed set to:");
+        log.log(configured_can_speed);
+        break;
+      default:
+        log.log("Lawicel failed to set canusb speed. ");
+        log.log("Response from adapter was: 0x%x\n", recv_buf[0]);
+        break;
+    }/*switch*/
+  }/*else*/
 
   return 1;
 }/*lawicel_canusb::set_lawicel_canusb_speed*/
@@ -217,6 +250,23 @@ int lawicel_canusb::open_lawicel_canusb(){
     return 0;
   }/*if*/
 
+  char recv_buf[128];
+
+  if(read(ttyfd, recv_buf, 128) == -1){
+    perror("Failed to read response from adapter: ");
+  }/*if*/
+  else{
+    switch(recv_buf[0]){
+      case '\r':
+        log.log("CAN bus opened successfully!");
+        break;
+      default:
+        log.log("CAN bus failed to open!");
+        log.log("Response from adapter was: 0x%x\n", recv_buf[0]);
+        break;
+    }/*switch*/
+  }/*else*/
+
   return 1;
 }/*lawicel_canusb::open_lawicel_canusb*/
 
@@ -226,6 +276,23 @@ int lawicel_canusb::close_lawicel_canusb(){
     perror("Could not close CAN bus");
     return 0;
   }/*if*/
+  
+  char recv_buf[128];
+
+  if(read(ttyfd, recv_buf, 128) == -1){
+    perror("Failed to read response from adapter: ");
+  }/*if*/
+  else{
+    switch(recv_buf[0]){
+      case '\r':
+        log.log("CAN bus closed successfully!");
+        break;
+      default:
+        log.log("CAN bus failed to close!");
+        log.log("Response from adapter was: 0x%x\n", recv_buf[0]);
+        break;
+    }/*switch*/
+  }/*else*/
 
   return 1;
 }/*lawicel_canusb::close_lawicel_canusb*/

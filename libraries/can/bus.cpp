@@ -6,6 +6,8 @@
  */
 
 #include "bus.hpp"
+#include <unistd.h>
+#include <fcntl.h>
 
 namespace can{
 
@@ -70,6 +72,8 @@ int bus::open(void){
 
   strcpy(ifr.ifr_name, busname);
   ioctl(bus_socket, SIOCGIFINDEX, &ifr);
+
+  fcntl(bus_socket, F_SETFL, O_NONBLOCK);
 
   addr.can_ifindex = ifr.ifr_ifindex;
   addr.can_family = PF_CAN;
