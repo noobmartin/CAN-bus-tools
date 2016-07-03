@@ -32,8 +32,9 @@
 
 namespace canusb_devices{
 
-#define MAX_TTY_TX_SIZE 256
-#define LDISC_N_SLCAN 17
+#define MAX_TTY_TX_SIZE             256
+#define LDISC_N_SLCAN               17
+#define ADAPTER_RECEIVE_BUFFER_SIZE 128
 
 typedef enum can_speed{
 	Kbit_10,
@@ -53,9 +54,13 @@ class lawicel_canusb{
     char tty_tx_buf[MAX_TTY_TX_SIZE];
     char serial_device_path[PATH_MAX];
     char interface_name[IFNAMSIZ];
+    char receive_buffer[ADAPTER_RECEIVE_BUFFER_SIZE];
     const char* adapter_name = "Lawicel CAN-USB adapter";
 
     logging_services::logger  log;
+
+    int poll_adapter_response(void);
+    int parse_adapter_status(void);
 
   public:
     lawicel_canusb();
@@ -116,6 +121,12 @@ class lawicel_canusb{
      * Use this if you want a pointer to the Ethernet interface name the Lawicel CANUSB adapter is mapped to.
      */
     const char* get_interface_name(void);
+
+    /* This may be used before calling create_lawicel_canusb_interface, but not after. 
+     * Once that function has been called, the file descriptor will be associated with an "Ethernet"
+     * interface, and cannot be communicated with using regular read/write operations
+     */
+    int check_adapter_status(void);
 };
 
 }

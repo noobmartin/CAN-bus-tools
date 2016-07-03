@@ -8,6 +8,7 @@
 #include "bus.hpp"
 #include <unistd.h>
 #include <fcntl.h>
+#include <errno.h>
 
 namespace can{
 
@@ -136,7 +137,14 @@ int bus::receive(const unsigned size, char* buf, unsigned int* can_id){
   int read_bytes = read(bus_socket, &read_frame, sizeof(read_frame));
 
   if(read_bytes < 0){
-    perror("CAN bus read returned < 0");
+    switch(errno){
+      case EAGAIN:
+        break;
+      default:
+        perror("CAN bus read returned < 0");
+        break;
+    }/*switch*/
+
     return -1;
   }/*if*/
   else{

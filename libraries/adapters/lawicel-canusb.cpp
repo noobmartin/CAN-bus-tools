@@ -99,23 +99,18 @@ int lawicel_canusb::set_lawicel_canusb_speed(can_speed Speed){
     return 0;
   }/*if*/
 
-  char recv_buf[128];
-
-  if(read(ttyfd, recv_buf, 128) == -1){
-    perror("Failed to read response from adapter: ");
-  }/*if*/
-  else{
-    switch(recv_buf[0]){
+  if(poll_adapter_response() != 0){
+    switch(receive_buffer[0]){
       case '\r':
         log.log("BTR 0 set to 0x40");
         log.log("BTR 1 set to 0x37");
         break;
       default:
         log.log("Lawicel failed to set BTR flags. ");
-        log.log("Response from adapter was: 0x%x\n", recv_buf[0]);
+        log.log("Response from adapter was: 0x%x\n", receive_buffer[0]);
         break;
     }/*switch*/
-  }/*else*/
+  }/*if*/
 
   char* configured_can_speed = NULL;
 
@@ -169,26 +164,25 @@ int lawicel_canusb::set_lawicel_canusb_speed(can_speed Speed){
     return 0;
   }/*if*/
 
-  if(read(ttyfd, recv_buf, 128) == -1){
-    perror("Failed to read response from adapter: ");
-  }/*if*/
-  else{
-    switch(recv_buf[0]){
+  if(poll_adapter_response() != 0){
+    switch(receive_buffer[0]){
       case '\r':
         log.log("Canusb speed set to:");
         log.log(configured_can_speed);
         break;
       default:
         log.log("Lawicel failed to set canusb speed. ");
-        log.log("Response from adapter was: 0x%x\n", recv_buf[0]);
+        log.log("Response from adapter was: 0x%x\n", receive_buffer[0]);
         break;
     }/*switch*/
-  }/*else*/
+  }/*if*/
 
   return 1;
 }/*lawicel_canusb::set_lawicel_canusb_speed*/
 
 int lawicel_canusb::create_lawicel_canusb_interface(){
+  check_adapter_status();
+
   int ldisc = LDISC_N_SLCAN;
   if( ioctl(ttyfd, TIOCSETD, &ldisc) < 0){
     perror("Could not create interface");
@@ -250,22 +244,17 @@ int lawicel_canusb::open_lawicel_canusb(){
     return 0;
   }/*if*/
 
-  char recv_buf[128];
-
-  if(read(ttyfd, recv_buf, 128) == -1){
-    perror("Failed to read response from adapter: ");
-  }/*if*/
-  else{
-    switch(recv_buf[0]){
+  if(poll_adapter_response() != 0){
+    switch(receive_buffer[0]){
       case '\r':
         log.log("CAN bus opened successfully!");
         break;
       default:
         log.log("CAN bus failed to open!");
-        log.log("Response from adapter was: 0x%x\n", recv_buf[0]);
+        log.log("Response from adapter was: 0x%x\n", receive_buffer[0]);
         break;
     }/*switch*/
-  }/*else*/
+  }/*if*/
 
   return 1;
 }/*lawicel_canusb::open_lawicel_canusb*/
@@ -277,22 +266,17 @@ int lawicel_canusb::close_lawicel_canusb(){
     return 0;
   }/*if*/
   
-  char recv_buf[128];
-
-  if(read(ttyfd, recv_buf, 128) == -1){
-    perror("Failed to read response from adapter: ");
-  }/*if*/
-  else{
-    switch(recv_buf[0]){
+  if(poll_adapter_response() != 0){
+    switch(receive_buffer[0]){
       case '\r':
         log.log("CAN bus closed successfully!");
         break;
       default:
         log.log("CAN bus failed to close!");
-        log.log("Response from adapter was: 0x%x\n", recv_buf[0]);
+        log.log("Response from adapter was: 0x%x\n", receive_buffer[0]);
         break;
     }/*switch*/
-  }/*else*/
+  }/*if*/
 
   return 1;
 }/*lawicel_canusb::close_lawicel_canusb*/
@@ -334,5 +318,93 @@ int lawicel_canusb::auto_setup(){
 const char* lawicel_canusb::get_interface_name(void){
   return interface_name;
 }/*lawicel_canusb::get_interface_name*/
+
+int lawicel_canusb::check_adapter_status(void){
+  sprintf(tty_tx_buf, "F\r");
+  if( write(ttyfd, tty_tx_buf, strlen(tty_tx_buf)) == -1){
+    log.log("Could not request status flags.");
+    perror("Error");
+    return 0;
+  }/*if*/
+
+  if(poll_adapter_response() != 0){
+    switch(receive_buffer[0]){
+      case 0x07:
+        log.log("Bus has not been opened!");
+        break;
+      case 'F':
+        if(parse_adapter_status() == 0){
+          log.log("The adapter is reporting errors.");
+        }/*if*/
+        break;
+      default:
+        log.log("Unknown response when trying to read status flags.");
+        break;
+    }/*switch*/
+  }/*if*/
+  else{
+    return -1;
+  }/*else*/
+
+}/*lawicel_canusb::check_adapter_status*/
+
+int lawicel_canusb::parse_adapter_status(void){
+  char high_nibble[2];
+  char low_nibble[2];
+
+  high_nibble[0]  = receive_buffer[1];
+  high_nibble[1]  = '\0';
+  low_nibble[0]   = receive_buffer[2];
+  low_nibble[1]   = '\0';
+
+  int high_nibble_val  = atoi(high_nibble);
+  int low_nibble_val   = atoi(low_nibble);
+
+  if(high_nibble_val & 0x1){
+    log.log("Not used.");
+  }/*if*/
+  if(high_nibble_val & 0x2){
+    log.log("Error passive (EPI).");
+  }/*if*/
+  if(high_nibble_val & 0x4){
+    log.log("Arbitration lost (ALI).");
+  }/*if*/
+  if(high_nibble_val & 0x8){
+    log.log("Bus error (BEI)");
+  }/*if*/
+
+  if(low_nibble_val & 0x1){
+    log.log("CAN Rx FIFO queue full.");
+  }/*if*/
+  if(low_nibble_val & 0x2){
+    log.log("CAN Tx FIFO queue full.");
+  }/*if*/
+  if(low_nibble_val & 0x4){
+    log.log("Error warning (EI)");
+  }/*if*/
+  if(low_nibble_val & 0x8){
+    log.log("Data overrun (DOI)");
+  }/*if*/
+
+
+  if( (high_nibble_val == 0x0) && (low_nibble_val == 0x0) ){
+    log.log("All is well - no errors reported by the adapter.");
+    return 1;
+  }/*if*/
+  else{
+    return 0;
+  }/*else*/
+
+}/*lawicel_canusb::parse_adapter_status*/
+
+int lawicel_canusb::poll_adapter_response(void){
+  if(read(ttyfd, receive_buffer, ADAPTER_RECEIVE_BUFFER_SIZE) == -1){
+    perror("Failed to read response from adapter: ");
+    return 0;
+  }/*if*/
+  else{
+    return 1;
+  }/*else*/
+}/*lawicel_canusb::poll_adapter_response*/
 
 }/*canusb_devices*/
